@@ -1,0 +1,26 @@
+/* Template Name: Edupath - Online Courses & Education HTML5 Template
+   Author: Shreethemes
+   Email: support@shreethemes.in
+   Website: https://shreethemes.in
+   Version: 1.0.0
+   Created: November 2024
+   File: Main Css File
+   */
+// FONTS
+
+@use "custom/fonts";
+
+// general
+@use "custom/general";
+
+// structure
+@use "custom/structure/topnav";
+@use "custom/structure/footer";
+
+// pages
+@use "custom/pages/helper";
+@use "custom/pages/hero";
+@use "custom/pages/testi";
+@use "custom/pages/countdown";
+@use "custom/pages/swiper-slider";
+@use "custom/pages/contact";

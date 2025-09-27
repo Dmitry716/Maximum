@@ -1,0 +1,14 @@
+User-Agent: *
+
+Crawl-delay: 10
+
+Allow: /
+Allow: /courses
+Allow: /blog/
+Allow: /news/
+Allow: /aboutus/
+Allow: /contact/
+
+Disallow: /api/
+
+Sitemap: https://maxximum.by/sitemap.xml
