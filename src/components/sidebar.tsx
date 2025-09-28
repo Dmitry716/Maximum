@@ -80,6 +80,12 @@ export function Sidebar({ className }: SidebarProps) {
       href: "/dashboard/users",
       active: pathname === "/users",
     },
+    {
+      label: "Управление SEO",
+      icon: Users,
+      href: "/dashboard/seo",
+      active: pathname === "/seo",
+    },
   ]
 
   const routes =
