@@ -1,5 +1,6 @@
 import { api } from "@/lib/auth";
 import { Blog, Categories, Category, Course, CourseQueryParams, CreateApplication, CreateGroup, CreateUserAndBindGroup, FileRes, Group, NewsItem, PaginatedCourses, UpdateApplication, UpdateBlog, UpdateCourse, User } from "@/types/type";
+import { SeoData, GetSeoResponse } from "@/types/seo"; 
 
 export const backendUrl = process.env.NEXT_PUBLIC_API_URL
 
@@ -422,4 +423,42 @@ export async function getAllBlogsPublic(
 
   const { data } = await api.get(`/api/blog?${params.toString()}`);
   return data as { items: Blog[]; total: number };
+}
+
+// export async function getSeoByPageName(pageName: string): Promise<SeoData | null> {
+//   try {
+//     const response = await api.get<GetSeoResponse>(`/api/seo/${pageName}`);
+//     return response.data.data;
+//   } catch (error) {
+//     console.error(`Error fetching SEO data for page: ${pageName}`, error);
+//     return null;
+//   }
+// }
+
+// export async function updateSeo(seoData: SeoData): Promise<SeoData> {
+//   const response = await api.put<SeoData>(`/api/seo/${seoData.pageName}`, seoData);
+//   return response.data;
+// }
+
+// GET /api/blog/seo/:pageName -> возвращает BlogPost или null
+export async function getSeoByPageName(pageName: string): Promise<Blog | null> { // Измените тип возвращаемого значения на Blog | null
+  try {
+    const response = await api.get<Blog | null>(`/api/blog/seo/${pageName}`); // Изменили путь
+    return response.data; // API возвращает null, если не найдено
+  } catch (error: any) {
+    // Обрабатываем 404 как отсутствие данных, а не как ошибку
+    if (error.response?.status === 404) {
+      return null;
+    }
+    console.error(`Error fetching SEO data for page: ${pageName}`, error);
+    // В зависимости от логики, можно бросить ошибку или вернуть null
+    // throw error; // Если хотите пробросить ошибку дальше
+    return null; // Если хотите считать любую ошибку отсутствием данных
+  }
+}
+
+// PUT /api/blog/seo/:pageName -> принимает частичные данные BlogPost
+export async function updateSeo(pageName: string, seoData: Partial<Blog>): Promise<Blog> { // Измените тип возвращаемого значения на Blog
+  const response = await api.put<Blog>(`/api/blog/seo/${pageName}`, seoData); // Изменили путь
+  return response.data;
 }

@@ -7,7 +7,7 @@ import {
   GlobalDragHandle,
   HighlightExtension,
   HorizontalRule,
-  MarkdownExtension,
+  // MarkdownExtension,
   Mathematics,
   Placeholder,
   StarterKit,
@@ -148,16 +148,16 @@ const mathematics = Mathematics.configure({
 
 const characterCount = CharacterCount.configure();
 
-const markdownExtension = MarkdownExtension.configure({
-  html: true,
-  tightLists: true,
-  tightListClass: "tight",
-  bulletListMarker: "-",
-  linkify: false,
-  breaks: false,
-  transformPastedText: false,
-  transformCopiedText: false,
-});
+// const markdownExtension = MarkdownExtension.configure({
+//   html: true,
+//   tightLists: true,
+//   tightListClass: "tight",
+//   bulletListMarker: "-",
+//   linkify: false,
+//   breaks: false,
+//   transformPastedText: false,
+//   transformCopiedText: false,
+// });
 
 export const defaultExtensions = [
   starterKit,
@@ -175,7 +175,7 @@ export const defaultExtensions = [
   mathematics,
   characterCount,
   TiptapUnderline,
-  markdownExtension,
+  // markdownExtension,
   HighlightExtension,
   TextStyle,
   Color,

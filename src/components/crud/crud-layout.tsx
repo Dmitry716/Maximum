@@ -7,7 +7,7 @@ interface CrudLayoutProps {
   description: string
   isButton?: boolean
   createButtonLabel: string
-  onCreateClick: () => void
+  onCreateClick?: () => void
   children: React.ReactNode
 }
 

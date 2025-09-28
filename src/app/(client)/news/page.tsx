@@ -8,19 +8,40 @@ import { getNews } from '@/api/requests';
 import Blog from '@/components/blog';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Metadata } from 'next';
-
-type Props = {
-  searchParams: Promise<{ [key: string]: string | string | undefined }>
-}
+import { getSeoByPageName } from '@/api/requests';
+import { Blog as BlogType } from '@/types/type'; // Используем тип Blog
 
 export async function generateMetadata(): Promise<Metadata> {
+  let seoBlogPost: BlogType | null = null;
+  try {
+    // Используем обновленный метод для получения SEO-данных для общей страницы
+    seoBlogPost = await getSeoByPageName('news');
+  } catch (error) {
+    console.error("Error fetching SEO data for /news, using defaults:", error);
+    // Просто продолжаем, seoBlogPost останется null
+  }
+
+  // Определяем значения: из API (из BlogPost) или дефолтные
+  const title = seoBlogPost?.metaTitle || "Новости | статьи центра «Максимум» в Витебске";
+  const description = seoBlogPost?.metaDescription || "Читайте свежие статьи, полезные советы и новости из жизни спортивно-образовательного центра «Максимум» в Витебске. Будьте в курсе событий и достижений!";
+  const keywords = seoBlogPost?.keywords ? seoBlogPost.keywords.split(",").filter(Boolean) : [
+    "Новости Максимум",
+    "статьи",
+    "новости центра",
+    "советы",
+    "спорт и образование",
+    "Витебск",
+    "мероприятия",
+    "достижения",
+  ];
+
   return {
-    title: "Новости | статьи центра «Максимум» в Витебске",
-    description: "Читайте свежие статьи, полезные советы и новости из жизни спортивно-образовательного центра «Максимум» в Витебске. Будьте в курсе событий и достижений!",
-    keywords: ["Новости Максимум", "статьи", "новости центра", "советы", "спорт и образование", "Витебск", "мероприятия", "достижения"],
+    title,
+    description,
+    keywords,
     openGraph: {
-      title: "Новости | Центр «Максимум»",
-      description: "Полезные материалы, советы и актуальные новости от спортивно-образовательного центра «Максимум» в Витебске.",
+      title: seoBlogPost?.metaTitle || "Новости | Центр «Максимум»", // Используем то же, что и в title
+      description: seoBlogPost?.metaDescription || "Полезные материалы, советы и актуальные новости от спортивно-образовательного центра «Максимум» в Витебске.", // Используем то же, что и в description
       url: `${process.env.NEXT_PUBLIC_API_URL}/news`,
       siteName: "Максимум",
       type: "website",
@@ -28,8 +49,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: "Новости | Центр «Максимум»",
-      description: "Полезные материалы, советы и актуальные новости от спортивно-образовательного центра «Максимум» в Витебске.",
+      title: seoBlogPost?.metaTitle || "Новости | Центр «Максимум»", // Используем то же, что и в title
+      description: seoBlogPost?.metaDescription || "Полезные материалы, советы и актуальные новости от спортивно-образовательного центра «Максимум» в Витебске.", // Используем то же, что и в description
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/news`,
@@ -37,7 +58,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+
 export const revalidate = 600
+
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string | undefined }>
+}
 
 export default async function NewsPage({ searchParams }: Props) {
   const { page } = await searchParams

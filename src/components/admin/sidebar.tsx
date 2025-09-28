@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import type React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import type React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   BookOpen,
@@ -14,16 +14,16 @@ import {
   LogOut,
   FileText,
   Menu,
-} from "lucide-react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+} from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className }: SidebarProps) {
-  const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   const routes = [
     {
@@ -74,7 +74,13 @@ export function Sidebar({ className }: SidebarProps) {
       href: "/admin/users",
       active: pathname === "/admin/users",
     },
-  ]
+    {
+      label: "SEO",
+      icon: BookOpen,
+      href: "/admin/seo",
+      active: pathname === "/admin/seo",
+    },
+  ];
 
   return (
     <>
@@ -90,7 +96,7 @@ export function Sidebar({ className }: SidebarProps) {
         className={cn(
           "fixed inset-y-0 left-0 h-full w-[240px] flex-col border-r bg-background transition-transform duration-300 ease-in-out md:flex md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          className,
+          className
         )}
       >
         <div className="flex h-14 items-center border-b px-4">
@@ -102,7 +108,9 @@ export function Sidebar({ className }: SidebarProps) {
               <Link
                 key={route.href}
                 href={route.href}
-                className={`sidebar-item ${route.active ? "sidebar-item-active" : ""}`}
+                className={`sidebar-item ${
+                  route.active ? "sidebar-item-active" : ""
+                }`}
                 onClick={() => setIsOpen(false)}
               >
                 <route.icon className="h-5 w-5" />
@@ -128,6 +136,5 @@ export function Sidebar({ className }: SidebarProps) {
         />
       )}
     </>
-  )
+  );
 }
-

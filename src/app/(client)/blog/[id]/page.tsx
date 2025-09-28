@@ -9,7 +9,7 @@ import { Blog as BlogType } from "@/types/type";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { RenderNovel } from "@/components/render-novel";
-import { Metadata } from "next";
+import { Metadata } from "next";  
 import BlogsSidebar from "@/components/blog-sidebar";
 import { notFound } from "next/navigation";
 import Image from "next/image";

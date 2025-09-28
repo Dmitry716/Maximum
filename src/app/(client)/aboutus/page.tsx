@@ -1,43 +1,69 @@
-import React from 'react'
-import Navbar from '@/components/navbar/navbar'
-import AboutOne from '@/components/about-one'
-import Features from '@/components/features'
-import Cta from '@/components/cta'
-import GetInTouch from '@/components/get-in-touch'
-import Footer from '@/components/footer'
-import ScrollToTop from '@/components/scroll-to-top'
-import Switcher from '@/components/switcher'
-import { Metadata } from 'next'
+import React from "react";
+import Navbar from "@/components/navbar/navbar";
+import AboutOne from "@/components/about-one";
+import Features from "@/components/features";
+import Cta from "@/components/cta";
+import GetInTouch from "@/components/get-in-touch";
+import Footer from "@/components/footer";
+import ScrollToTop from "@/components/scroll-to-top";
+import Switcher from "@/components/switcher";
+import { Metadata } from "next";
+import { getSeoByPageName } from '@/api/requests';
+import { Blog as BlogType } from '@/types/type'; // Используем тип Blog
 
 export async function generateMetadata(): Promise<Metadata> {
+  let seoBlogPost: BlogType | null = null;
+  try {
+    // Используем обновленный метод для получения SEO-данных для общей страницы
+    seoBlogPost = await getSeoByPageName('about');
+  } catch (error) {
+    console.error("Error fetching SEO data for /about, using defaults:", error);
+    // Просто продолжаем, seoBlogPost останется null
+  }
+
+  // Определяем значения: из API (из BlogPost) или дефолтные
+  const title = seoBlogPost?.metaTitle || "О нас | Спортивно-образовательный центр «Максимум» в Витебске";
+  const description = seoBlogPost?.metaDescription || "Спортивно-образовательный центр «Максимум» в Витебске — это профессиональные преподаватели, современные программы и индивидуальный подход. Узнайте о нашей миссии и достижениях!";
+  const keywords = seoBlogPost?.keywords ? seoBlogPost.keywords.split(",").filter(Boolean) : [
+    "о нас",
+    "спортивный центр Витебск",
+    "преподаватели",
+    "наши достижения",
+    "миссия центра",
+    "о Максимуме"
+  ];
+
+  // Опционально: Используем изображение из SEO-данных, если оно есть, иначе дефолтное
+  const ogImageUrl = seoBlogPost?.images?.[0] || `${process.env.NEXT_PUBLIC_API_URL}/images/og/og.jpg`; // Пример: используем первое изображение из BlogPost или дефолтное
+
   return {
-    title: "О нас | Спортивно-образовательный центр «Максимум» в Витебске",
-    description: "Спортивно-образовательный центр «Максимум» в Витебске — это профессиональные преподаватели, современные программы и индивидуальный подход. Узнайте о нашей миссии и достижениях!",
-    keywords: ["о нас", "спортивный центр Витебск", "преподаватели", "наши достижения", "миссия центра", "о Максимуме"],
+    title,
+    description,
+    keywords,
     openGraph: {
-      title: "О нас | Спортивный центр «Максимум» в Витебске",
-      description: "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!",
+      title: seoBlogPost?.metaTitle || "О нас | Спортивный центр «Максимум» в Витебске", // Используем то же, что и в title
+      description: seoBlogPost?.metaDescription || "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!", // Используем то же, что и в description
       type: "website",
       url: `${process.env.NEXT_PUBLIC_API_URL}/about`,
       images: [
         {
-          url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/og.jpg`,
+          url: ogImageUrl,
           width: 800,
           height: 600,
-          alt: "Спортивно-образовательный центр «Максимум» в Витебске",
+          alt: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
         },
       ]
     },
     twitter: {
       card: "summary_large_image",
-      title: "О нас | Спортивный центр «Максимум» в Витебске",
-      description: "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!",
+      title: seoBlogPost?.metaTitle || "О нас | Спортивный центр «Максимум» в Витебске", // Используем то же, что и в title
+      description: seoBlogPost?.metaDescription || "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!", // Используем то же, что и в description
       images: [
         {
-          url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/og.jpg`,
+          url: ogImageUrl,
           width: 800,
           height: 600,
-          alt: "Спортивно-образовательный центр «Максимум» в Витебске",
+          alt: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
         },
       ]
     },
@@ -52,19 +78,31 @@ export default function Page() {
     <>
       <Navbar navlight={true} tagline={false} />
 
-      <section className="relative table w-full py-32 lg:py-72 bg-no-repeat bg-center bg-cover" style={{ backgroundImage: `url('/images/course/4.jpg')` }}>
+      <section
+        className="relative table w-full py-32 lg:py-72 bg-no-repeat bg-center bg-cover"
+        style={{ backgroundImage: `url('/images/course/4.jpg')` }}
+      >
         <div className="absolute inset-0 bg-black opacity-80"></div>
         <div className="container relative">
           <div className="grid grid-cols-1 text-center mt-10">
-            <h3 className="md:text-3xl text-2xl md:leading-normal leading-normal font-semibold text-white">О Нас</h3>
+            <h3 className="md:text-3xl text-2xl md:leading-normal leading-normal font-semibold text-white">
+              О Нас
+            </h3>
           </div>
         </div>
       </section>
 
       <div className="relative">
         <div className="shape overflow-hidden z-1 text-white dark:text-slate-900">
-          <svg viewBox="0 0 2880 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 48H1437.5H2880V0H2160C1442.5 52 720 0 720 0H0V48Z" fill="currentColor"></path>
+          <svg
+            viewBox="0 0 2880 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 48H1437.5H2880V0H2160C1442.5 52 720 0 720 0H0V48Z"
+              fill="currentColor"
+            ></path>
           </svg>
         </div>
       </div>
@@ -80,7 +118,8 @@ export default function Page() {
             </h4>
 
             <p className="text-slate-400 max-w-xl mx-auto">
-              Ознакомьтесь с новыми предложениями и возможностями для обучения и развития.
+              Ознакомьтесь с новыми предложениями и возможностями для обучения и
+              развития.
             </p>
           </div>
           <Features />
@@ -90,7 +129,6 @@ export default function Page() {
       <Cta />
 
       <section className="relative lg:py-24 py-16">
-
         <div className="container relative lg:mt-24 mt-16">
           <GetInTouch />
         </div>
@@ -99,5 +137,5 @@ export default function Page() {
       <ScrollToTop />
       <Switcher />
     </>
-  )
+  );
 }
