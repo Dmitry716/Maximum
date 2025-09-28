@@ -1,4 +1,3 @@
-// front\src\app\dashboard\seo\page.tsx
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -14,6 +13,7 @@ import { toast } from 'sonner';
 
 // Определим список страниц, для которых можно управлять SEO
 const SEO_PAGES = [
+  { value: 'home', label: 'Главная страница (/)' },
   { value: 'courses', label: 'Список курсов (/courses)' },
   { value: 'blog', label: 'Список блогов (/blog)' },
   { value: 'news', label: 'Список новостей (/news)' },

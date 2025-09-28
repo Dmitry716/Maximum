@@ -10,6 +10,80 @@ import GetInTouch from '@/components/get-in-touch'
 import Footer from '@/components/footer'
 import ScrollToTop from '@/components/scroll-to-top'
 import Switcher from '@/components/switcher'
+import { Metadata } from 'next'
+import { Blog as BlogType } from '@/types/type'
+import { getSeoByPageName } from '@/api/requests'
+
+export async function generateMetadata(): Promise<Metadata> {
+  let seoBlogPost: BlogType | null = null;
+  try {
+    seoBlogPost = await getSeoByPageName('home'); 
+  } catch (error) {
+    console.error("Error fetching SEO data for homepage, using defaults:", error);
+    // Просто продолжаем, seoBlogPost останется null
+  }
+
+  // Определяем значения: из API (из BlogPost) или дефолтные
+  const title = seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске";
+  const description = seoBlogPost?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.";
+  const keywords = seoBlogPost?.keywords ? seoBlogPost.keywords.split(",").filter(Boolean) : [
+    "спортивный центр Витебск",
+    "образовательный центр Максимум",
+    "детские курсы Витебск",
+    "развитие детей Витебск",
+    "спорт и образование"
+  ];
+
+  return {
+    title,
+    description,
+    keywords,
+    openGraph: {
+      title: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
+      description: seoBlogPost?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.",
+      type: "website",
+      url: `${process.env.NEXT_PUBLIC_API_URL}/`, // URL главной страницы
+      images: seoBlogPost?.images?.[0] ? [ // Если есть изображение в SEO-записи, используем его
+        {
+          url: `${process.env.NEXT_PUBLIC_API_URL}/${seoBlogPost.images[0]}`,
+          width: 1200, // Уточните размеры, если известны
+          height: 630,
+          alt: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум»",
+        }
+      ] : [ // Иначе используем дефолтное
+        {
+          url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/home-og.jpg`, // Укажите путь к дефолтному OG изображению
+          width: 1200,
+          height: 630,
+          alt: "Спортивно-образовательный центр «Максимум» в Витебске",
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
+      description: seoBlogPost?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске.",
+      images: seoBlogPost?.images?.[0] ? [ // Аналогично OG
+        {
+          url: `${process.env.NEXT_PUBLIC_API_URL}/${seoBlogPost.images[0]}`,
+          width: 1200,
+          height: 630,
+          alt: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум»",
+        }
+      ] : [
+        {
+          url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/home-og.jpg`,
+          width: 1200,
+          height: 630,
+          alt: "Спортивно-образовательный центр «Максимум» в Витебске",
+        }
+      ]
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_API_URL}/`, // Canonical для главной страницы
+    },
+  };
+}
 
 export default function Page() {
   return (
