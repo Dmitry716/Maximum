@@ -6,7 +6,7 @@ import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { FiChevronRight } from "react-icons/fi";
 import Courses from "@/components/courses/courses";
-import { getAllAges, getCategories } from "@/api/requests";
+import { getAllAges, getAllCoursesPublic, getCategories } from "@/api/requests";
 import { getSeoSettingsByPageName } from "@/api/requests";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
@@ -93,6 +93,7 @@ export default async function Page(props: { params: paramsType }) {
   const { courses } = await props.params;
   const ages = await getAllAges();
   const categories = await getCategories();
+  const allCourses = await getAllCoursesPublic()
 
   // JSON-LD для страницы "все курсы"
   const collectionSchema = {
@@ -104,7 +105,7 @@ export default async function Page(props: { params: paramsType }) {
     url: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: [{ courses }],
+      itemListElement: [allCourses.items],
     },
   };
 

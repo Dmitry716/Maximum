@@ -109,7 +109,7 @@ export default async function Page(props: { params: paramsType }) {
       priceCurrency: "BYN",
       availability: "https://schema.org/InStock",
     },
-    courseMode: "onsite",
+    courseMode: "online",
     about:
       course.category && typeof course.category === "object"
         ? course.category.name
