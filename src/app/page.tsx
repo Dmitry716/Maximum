@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
     // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName('home'); 
+    seoData = await getSeoSettingsByPageName('home');
   } catch (error) {
     console.error("Error fetching SEO data for homepage, using defaults:", error);
     // Просто продолжаем, seoData останется null
@@ -36,6 +36,20 @@ export async function generateMetadata(): Promise<Metadata> {
     "спорт и образование"
   ];
 
+  // Получаем ogImage из SEO-данных
+  let ogImageUrl = seoData?.ogImage;
+
+  // Если ogImage не задан — используем дефолтное изображение
+  if (!ogImageUrl) {
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
+  }
+
+  // Если ogImage начинается с http:// или https:// — оставляем как есть
+  // Иначе — добавляем базовый URL (если путь относительный)
+  if (ogImageUrl && !ogImageUrl.startsWith('http://') && !ogImageUrl.startsWith('https://')) {
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+  }
+
   return {
     title,
     description,
@@ -45,41 +59,21 @@ export async function generateMetadata(): Promise<Metadata> {
       description: seoData?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.",
       type: "website",
       url: `${process.env.NEXT_PUBLIC_API_URL}/`, // URL главной страницы
-      images: seoData?.ogImage?.[0] ? [ // Если есть изображение в SEO-записи, используем его
+      images: [
         {
-          url: `${process.env.NEXT_PUBLIC_API_URL}/${seoData.ogImage[0]}`,
-          width: 1200, // Уточните размеры, если известны
-          height: 630,
-          alt: seoData?.metaTitle || "Спортивно-образовательный центр «Максимум»",
-        }
-      ] : [ // Иначе используем дефолтное
-        {
-          url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/home-og.jpg`, // Укажите путь к дефолтному OG изображению
+          url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: "Спортивно-образовательный центр «Максимум» в Витебске",
-        }
-      ]
+          alt: title,
+        },
+      ],
+      locale: "ru_RU"
     },
     twitter: {
       card: "summary_large_image",
       title: seoData?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
       description: seoData?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске.",
-      images: seoData?.ogImage?.[0] ? [ // Аналогично OG
-        {
-          url: `${process.env.NEXT_PUBLIC_API_URL}/${seoData.ogImage[0]}`,
-          width: 1200,
-          height: 630,
-          alt: seoData?.metaTitle || "Спортивно-образовательный центр «Максимум»",
-        }
-      ] : [
-        {
-          url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/home-og.jpg`,
-          width: 1200,
-          height: 630,
-          alt: "Спортивно-образовательный центр «Максимум» в Витебске",
-        }
-      ]
+      images: [ogImageUrl],
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/`, // Canonical для главной страницы

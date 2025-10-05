@@ -74,8 +74,8 @@ export default function Navbar({ navlight, tagline }: { navlight: any, tagline: 
 
                     <li
                       className={`has-submenu parent-parent-menu-item 
-                          ${['/aboutus'].includes(manu) ? 'active' : ''}`}>
-                      <Link href="/aboutus" >О Нас</Link>
+                          ${['/about'].includes(manu) ? 'active' : ''}`}>
+                      <Link href="/about" >О Нас</Link>
                     </li>
                     <li className={`has-submenu parent-parent-menu-item ${['/courses', '/courses/id'].includes(manu) ? 'active' : ''}`}>
                       <Link href="/courses" >Направления</Link>
@@ -121,8 +121,8 @@ export default function Navbar({ navlight, tagline }: { navlight: any, tagline: 
 
               <li
                 className={`has-submenu parent-parent-menu-item 
-              ${['/aboutus'].includes(manu) ? 'active' : ''}`}>
-                <Link href="/aboutus" >О Нас</Link>
+              ${['/about'].includes(manu) ? 'active' : ''}`}>
+                <Link href="/about" >О Нас</Link>
               </li>
 
               <li

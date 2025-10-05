@@ -79,7 +79,7 @@ export async function GET() {
       loc: `${Url}/courses`,
       lastmod: new Date().toISOString(),
       changefreq: "weekly",
-      priority: "0.9" as any,
+      priority: "1.0" as any,
     },
     {
       loc: `${Url}/blog`,

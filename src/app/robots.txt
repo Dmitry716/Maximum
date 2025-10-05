@@ -6,7 +6,7 @@ Allow: /
 Allow: /courses
 Allow: /blog/
 Allow: /news/
-Allow: /aboutus/
+Allow: /about/
 Allow: /contact/
 
 Disallow: /api/
