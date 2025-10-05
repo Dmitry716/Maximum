@@ -28,7 +28,7 @@ export async function GET() {
           loc,
           lastmod,
           changefreq: "monthly",
-          priority: "0.8" as any, 
+          priority: "0.9" as any, 
         },
       ];
     },
@@ -45,7 +45,7 @@ export async function GET() {
           loc,
           lastmod,
           changefreq: "weekly",
-          priority: "0.7" as any, 
+          priority: "0.8" as any, 
         },
       ];
     },
@@ -62,7 +62,7 @@ export async function GET() {
           loc,
           lastmod,
           changefreq: "daily",
-          priority: "0.9" as any,
+          priority: "0.8" as any,
         },
       ];
     },
@@ -73,7 +73,7 @@ export async function GET() {
       loc: `${Url}/`,
       lastmod: new Date().toISOString(),
       changefreq: "weekly",
-      priority: "1.0" as any,
+      priority: "0.9" as any,
     },
     {
       loc: `${Url}/courses`,

@@ -93,7 +93,7 @@ export default async function Page(props: { params: paramsType }) {
   const { courses } = await props.params;
   const ages = await getAllAges();
   const categories = await getCategories();
-  const allCourses = await getAllCoursesPublic()
+  const allCourses = await getAllCoursesPublic();
 
   // JSON-LD для страницы "все курсы"
   const collectionSchema = {
@@ -105,7 +105,21 @@ export default async function Page(props: { params: paramsType }) {
     url: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: [allCourses.items],
+      itemListElement: allCourses.items.map((course, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "Course",
+          name: course.name,
+          description: course.description,
+          url: `${process.env.NEXT_PUBLIC_API_URL}/courses/${course.url}`,
+          provider: {
+            "@type": "Organization",
+            name: "Спортивно-образовательный центр «Максимум»",
+            url: process.env.NEXT_PUBLIC_API_URL,
+          },
+        },
+      })),
     },
   };
 
@@ -178,7 +192,7 @@ export default async function Page(props: { params: paramsType }) {
         id="courses-collection-schema"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
-      
+
       <Navbar navlight={false} tagline={false} />
 
       {/*  breadcrumb */}
