@@ -93,7 +93,7 @@ export default async function Page(props: { params: paramsType }) {
   const { courses } = await props.params;
   const ages = await getAllAges();
   const categories = await getCategories();
-  const allCourses = await getAllCoursesPublic();
+  const allCourses = await getAllCoursesPublic({ limit: 1000, page: 1 });
 
   // JSON-LD для страницы "все курсы"
   const collectionSchema = {

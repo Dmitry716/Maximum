@@ -46,7 +46,7 @@ export default function Footer() {
                     />
                     <div className="min-h-[2rem]">
                       <div className="text-gray-300 text-sm leading-relaxed">
-                        Г. Витебск
+                        г. Витебск
                       </div>
                     </div>
                   </div>
