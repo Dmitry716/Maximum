@@ -11,22 +11,24 @@ import Footer from '@/components/footer'
 import ScrollToTop from '@/components/scroll-to-top'
 import Switcher from '@/components/switcher'
 import { Metadata } from 'next'
-import { Blog as BlogType } from '@/types/type'
-import { getSeoByPageName } from '@/api/requests'
+import { SeoSetting as SeoSettingType } from '@/types/type'
+import { getSeoSettingsByPageName } from '@/api/requests'
 
 export async function generateMetadata(): Promise<Metadata> {
-  let seoBlogPost: BlogType | null = null;
+  let seoData: SeoSettingType | null = null;
   try {
-    seoBlogPost = await getSeoByPageName('home'); 
+    // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
+    // Передаем 'home' как pageName, так как это главная страница
+    seoData = await getSeoSettingsByPageName('home'); 
   } catch (error) {
     console.error("Error fetching SEO data for homepage, using defaults:", error);
-    // Просто продолжаем, seoBlogPost останется null
+    // Просто продолжаем, seoData останется null
   }
 
   // Определяем значения: из API (из BlogPost) или дефолтные
-  const title = seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске";
-  const description = seoBlogPost?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.";
-  const keywords = seoBlogPost?.keywords ? seoBlogPost.keywords.split(",").filter(Boolean) : [
+  const title = seoData?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске";
+  const description = seoData?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.";
+  const keywords = seoData?.keywords ? seoData.keywords.split(",").filter(Boolean) : [
     "спортивный центр Витебск",
     "образовательный центр Максимум",
     "детские курсы Витебск",
@@ -39,16 +41,16 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     keywords,
     openGraph: {
-      title: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
-      description: seoBlogPost?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.",
+      title: seoData?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
+      description: seoData?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.",
       type: "website",
       url: `${process.env.NEXT_PUBLIC_API_URL}/`, // URL главной страницы
-      images: seoBlogPost?.images?.[0] ? [ // Если есть изображение в SEO-записи, используем его
+      images: seoData?.ogImage?.[0] ? [ // Если есть изображение в SEO-записи, используем его
         {
-          url: `${process.env.NEXT_PUBLIC_API_URL}/${seoBlogPost.images[0]}`,
+          url: `${process.env.NEXT_PUBLIC_API_URL}/${seoData.ogImage[0]}`,
           width: 1200, // Уточните размеры, если известны
           height: 630,
-          alt: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум»",
+          alt: seoData?.metaTitle || "Спортивно-образовательный центр «Максимум»",
         }
       ] : [ // Иначе используем дефолтное
         {
@@ -61,14 +63,14 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
-      description: seoBlogPost?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске.",
-      images: seoBlogPost?.images?.[0] ? [ // Аналогично OG
+      title: seoData?.metaTitle || "Спортивно-образовательный центр «Максимум» в Витебске",
+      description: seoData?.metaDescription || "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске.",
+      images: seoData?.ogImage?.[0] ? [ // Аналогично OG
         {
-          url: `${process.env.NEXT_PUBLIC_API_URL}/${seoBlogPost.images[0]}`,
+          url: `${process.env.NEXT_PUBLIC_API_URL}/${seoData.ogImage[0]}`,
           width: 1200,
           height: 630,
-          alt: seoBlogPost?.metaTitle || "Спортивно-образовательный центр «Максимум»",
+          alt: seoData?.metaTitle || "Спортивно-образовательный центр «Максимум»",
         }
       ] : [
         {

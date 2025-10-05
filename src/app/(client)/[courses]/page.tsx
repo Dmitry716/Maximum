@@ -7,24 +7,25 @@ import Switcher from "@/components/switcher";
 import { FiChevronRight } from "react-icons/fi";
 import Courses from "@/components/courses/courses";
 import { getAllAges, getCategories } from "@/api/requests";
-import { getSeoByPageName } from '@/api/requests';
-import { Blog as BlogType } from '@/types/type'; // Используем тип Blog
+import { getSeoSettingsByPageName } from '@/api/requests';
+import { SeoSetting as SeoSettingType } from '@/types/type';
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  let seoBlogPost: BlogType | null = null;
+  let seoData: SeoSettingType | null = null;
   try {
-    // Используем обновленный метод для получения SEO-данных для общей страницы
-    seoBlogPost = await getSeoByPageName('courses');
+    // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
+    // Передаем 'home' как pageName, так как это главная страница
+    seoData = await getSeoSettingsByPageName('courses'); 
   } catch (error) {
-    console.error("Error fetching SEO data for /courses, using defaults:", error);
-    // Просто продолжаем, seoBlogPost останется null
+    console.error("Error fetching SEO data for courses, using defaults:", error);
+    // Просто продолжаем, seoData останется null
   }
 
   // Определяем значения: из API (из BlogPost) или дефолтные
-  const title = seoBlogPost?.metaTitle || `Курсы | Maximum`;
-  const description = seoBlogPost?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum. Качественное образование и развитие навыков.`;
-  const keywords = seoBlogPost?.keywords ? seoBlogPost.keywords.split(",").filter(Boolean) : [
+  const title = seoData?.metaTitle || `Курсы | Maximum`;
+  const description = seoData?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum. Качественное образование и развитие навыков.`;
+  const keywords = seoData?.keywords ? seoData.keywords.split(",").filter(Boolean) : [
     "курсы",
     "образование",
     "дети",
@@ -36,15 +37,15 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     keywords,
     openGraph: {
-      title: seoBlogPost?.metaTitle || `Курсы | Maximum`,
-      description: seoBlogPost?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum.`,
+      title: seoData?.metaTitle || `Курсы | Maximum`,
+      description: seoData?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum.`,
       type: "website",
       url: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
     },
     twitter: {
       card: "summary_large_image",
-      title: seoBlogPost?.metaTitle || `Курсы | Maximum`,
-      description: seoBlogPost?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum.`,
+      title: seoData?.metaTitle || `Курсы | Maximum`,
+      description: seoData?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum.`,
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/courses`,

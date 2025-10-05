@@ -287,3 +287,14 @@ export type Application = CreateApplication & {
 }
 
 export type ApplicationWithLoading = Application & { isLoading?: boolean };
+
+export interface SeoSetting {
+  id: number;
+  pageName: string; // 'home', 'courses', 'blog', 'news', 'about', 'contact'
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  keywords?: string | null;
+  ogImage?: string | null; // URL изображения
+  createdAt: string; // ISO строка даты
+  updatedAt: string; // ISO строка даты
+}

@@ -1,7 +1,6 @@
 import { api } from "@/lib/auth";
-import { Blog, Categories, Category, Course, CourseQueryParams, CreateApplication, CreateGroup, CreateUserAndBindGroup, FileRes, Group, NewsItem, PaginatedCourses, UpdateApplication, UpdateBlog, UpdateCourse, User } from "@/types/type";
-import { SeoData, GetSeoResponse } from "@/types/seo"; 
-
+import { Blog, SeoSetting  as SeoSettingType, Categories, Category, Course, CourseQueryParams, CreateApplication, CreateGroup, CreateUserAndBindGroup, FileRes, Group, NewsItem, PaginatedCourses, UpdateApplication, UpdateBlog, UpdateCourse, User } from "@/types/type";
+[]
 export const backendUrl = process.env.NEXT_PUBLIC_API_URL
 
 export async function login(values: any) {
@@ -440,25 +439,35 @@ export async function getAllBlogsPublic(
 //   return response.data;
 // }
 
-// GET /api/blog/seo/:pageName -> возвращает BlogPost или null
-export async function getSeoByPageName(pageName: string): Promise<Blog | null> { // Измените тип возвращаемого значения на Blog | null
+export async function getSeoSettingsByPageName(pageName: string): Promise<SeoSettingType | null> {
   try {
-    const response = await api.get<Blog | null>(`/api/blog/seo/${pageName}`); // Изменили путь
-    return response.data; // API возвращает null, если не найдено
+    // !!! ВАЖНО: Изменяем путь на НОВЫЙ эндпоинт !!!
+    const response = await api.get<SeoSettingType | null>(`/api/seo/${pageName}`);
+    // API возвращает null, если запись не найдена
+    return response.data;
   } catch (error: any) {
     // Обрабатываем 404 как отсутствие данных, а не как ошибку
     if (error.response?.status === 404) {
+      console.warn(`SEO data for page '${pageName}' not found (404).`);
       return null;
     }
-    console.error(`Error fetching SEO data for page: ${pageName}`, error);
-    // В зависимости от логики, можно бросить ошибку или вернуть null
-    // throw error; // Если хотите пробросить ошибку дальше
-    return null; // Если хотите считать любую ошибку отсутствием данных
+    // Для других ошибок (500, сетевые проблемы и т.д.) логируем и пробрасываем или возвращаем null
+    console.error(`Error fetching SEO data for page '${pageName}':`, error);
+    // Можно выбросить ошибку дальше, если фронтенд ожидает её:
+    // throw error;
+    // Или вернуть null, чтобы фронтенд мог использовать дефолтные значения:
+    return null;
   }
 }
 
-// PUT /api/blog/seo/:pageName -> принимает частичные данные BlogPost
-export async function updateSeo(pageName: string, seoData: Partial<Blog>): Promise<Blog> { // Измените тип возвращаемого значения на Blog
-  const response = await api.put<Blog>(`/api/blog/seo/${pageName}`, seoData); // Изменили путь
+/**
+ * Обновить или создать SEO-данные для общей страницы.
+ * @param pageName Имя страницы (например, 'home', 'courses', 'blog')
+ * @param seoData Частичные SEO-данные для обновления/создания.
+ * @returns Обновленный или созданный объект SeoSetting.
+ */
+export async function updateSeoSettings(pageName: string, seoData: Partial<SeoSettingType>): Promise<SeoSettingType> {
+  // !!! ВАЖНО: Изменяем путь на НОВЫЙ эндпоинт !!!
+  const response = await api.put<SeoSettingType>(`/api/seo/${pageName}`, seoData);
   return response.data;
 }

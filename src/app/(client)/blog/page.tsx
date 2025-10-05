@@ -7,9 +7,10 @@ import Switcher from "@/components/switcher";
 import { getBlogs } from "@/api/requests";
 import Blog from "@/components/blog";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { getSeoByPageName } from "@/api/requests"; // Импортируем нашу новую функцию
-import { Blog as BlogType } from "@/types/type"; // Используем тип Blog для SEO-данных
+import { getSeoSettingsByPageName } from "@/api/requests"; // Импортируем нашу новую функцию
 import { Metadata } from "next";
+import { SeoSetting as SeoSettingType } from '@/types/type';
+
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string | undefined }>;
@@ -18,23 +19,24 @@ type Props = {
 export const revalidate = 600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  let seoBlogPost: BlogType | null = null;
+  let seoData: SeoSettingType | null = null;
   try {
-    // Используем существующий метод, но с 'blog' как URL для получения SEO-данных для общей страницы
-    seoBlogPost = await getSeoByPageName("blog");
+    // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
+    // Передаем 'home' как pageName, так как это главная страница
+    seoData = await getSeoSettingsByPageName('blog'); 
   } catch (error) {
-    console.error("Error fetching SEO data for /blog, using defaults:", error);
-    // Просто продолжаем, seoBlogPost останется null
+    console.error("Error fetching SEO data for blog, using defaults:", error);
+    // Просто продолжаем, seoData останется null
   }
 
   // Определяем значения: из API (из BlogPost) или дефолтные
   const title =
-    seoBlogPost?.metaTitle || "Блог | статьи центра «Максимум» в Витебске";
+    seoData?.metaTitle || "Блог | статьи центра «Максимум» в Витебске";
   const description =
-    seoBlogPost?.metaDescription ||
+    seoData?.metaDescription ||
     "Читайте свежие статьи, полезные советы и блог из жизни спортивно-образовательного центра «Максимум» в Витебске. Будьте в курсе событий и достижений!";
-  const keywords = seoBlogPost?.keywords
-    ? seoBlogPost.keywords.split(",").filter(Boolean)
+  const keywords = seoData?.keywords
+    ? seoData.keywords.split(",").filter(Boolean)
     : [
         "блог Максимум",
         "статьи",
@@ -51,9 +53,9 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     keywords,
     openGraph: {
-      title: seoBlogPost?.metaTitle || "Блог | Центр «Максимум»", // Используем то же, что и в title
+      title: seoData?.metaTitle || "Блог | Центр «Максимум»", // Используем то же, что и в title
       description:
-        seoBlogPost?.metaDescription ||
+        seoData?.metaDescription ||
         "Полезные материалы, советы и актуальные блог от спортивно-образовательного центра «Максимум» в Витебске.", // Используем то же, что и в description
       url: `${process.env.NEXT_PUBLIC_API_URL}/blog`,
       siteName: "Максимум",
@@ -62,9 +64,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: seoBlogPost?.metaTitle || "Блог | Центр «Максимум»", // Используем то же, что и в title
+      title: seoData?.metaTitle || "Блог | Центр «Максимум»", // Используем то же, что и в title
       description:
-        seoBlogPost?.metaDescription ||
+        seoData?.metaDescription ||
         "Полезные материалы, советы и актуальные блог от спортивно-образовательного центра «Максимум» в Витебске.", // Используем то же, что и в description
     },
     alternates: {
