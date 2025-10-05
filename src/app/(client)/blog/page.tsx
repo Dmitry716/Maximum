@@ -9,8 +9,8 @@ import Blog from "@/components/blog";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { getSeoSettingsByPageName } from "@/api/requests"; // Импортируем нашу новую функцию
 import { Metadata } from "next";
-import { SeoSetting as SeoSettingType } from '@/types/type';
-
+import { SeoSetting as SeoSettingType } from "@/types/type";
+import Script from "next/script";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string | undefined }>;
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
     // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName('blog');
+    seoData = await getSeoSettingsByPageName("blog");
   } catch (error) {
     console.error("Error fetching SEO data for blog, using defaults:", error);
     // Просто продолжаем, seoData останется null
@@ -38,15 +38,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const keywords = seoData?.keywords
     ? seoData.keywords.split(",").filter(Boolean)
     : [
-      "блог Максимум",
-      "статьи",
-      "блог центра",
-      "советы",
-      "спорт и образование",
-      "Витебск",
-      "мероприятия",
-      "достижения",
-    ];
+        "блог Максимум",
+        "статьи",
+        "блог центра",
+        "советы",
+        "спорт и образование",
+        "Витебск",
+        "мероприятия",
+        "достижения",
+      ];
 
   // Получаем ogImage из SEO-данных
   let ogImageUrl = seoData?.ogImage;
@@ -58,7 +58,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Если ogImage начинается с http:// или https:// — оставляем как есть
   // Иначе — добавляем базовый URL (если путь относительный)
-  if (ogImageUrl && !ogImageUrl.startsWith('http://') && !ogImageUrl.startsWith('https://')) {
+  if (
+    ogImageUrl &&
+    !ogImageUrl.startsWith("http://") &&
+    !ogImageUrl.startsWith("https://")
+  ) {
     ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
   }
   return {
@@ -111,8 +115,46 @@ export default async function BlogsPage({ searchParams }: Props) {
   const totalCount = result.total;
   const totalPages = Math.ceil(totalCount / limit);
 
+  // JSON-LD для списка блогов
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Блог | статьи центра «Максимум»",
+    description:
+      "Читайте свежие статьи, полезные советы и блог из жизни спортивно-образовательного центра «Максимум» в Витебске.",
+    url: `${process.env.NEXT_PUBLIC_API_URL}/blog`,
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: blogs.map((blog, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "BlogPosting",
+          headline: blog.title,
+          url: `${process.env.NEXT_PUBLIC_API_URL}/blog/${blog.url}`,
+          datePublished: blog.date
+            ? new Date(blog.date).toISOString()
+            : undefined,
+          author: {
+            "@type": "Person",
+            name: blog.author?.name || "Центр «Максимум»",
+          },
+          image: blog.images?.[0]
+            ? `${process.env.NEXT_PUBLIC_API_URL}/${blog.images[0]}`
+            : undefined,
+        },
+      })),
+    },
+  };
+
   return (
     <>
+      <Script
+        type="application/ld+json"
+        id="blog-collection-schema"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
+
       <Navbar navlight={true} tagline={false} />
 
       <section
@@ -179,10 +221,11 @@ export default async function BlogsPage({ searchParams }: Props) {
                         <li key={pageNum}>
                           <Link
                             href={`/blogs?page=${pageNum}#blogs`}
-                            className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${pageNum === currentPage
-                              ? "bg-violet-600 text-white"
-                              : "bg-white text-slate-400 hover:bg-violet-600 hover:text-white shadow-sm"
-                              }`}
+                            className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${
+                              pageNum === currentPage
+                                ? "bg-violet-600 text-white"
+                                : "bg-white text-slate-400 hover:bg-violet-600 hover:text-white shadow-sm"
+                            }`}
                           >
                             {pageNum}
                           </Link>

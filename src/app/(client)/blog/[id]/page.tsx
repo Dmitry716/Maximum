@@ -9,10 +9,11 @@ import { Blog as BlogType } from "@/types/type";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { RenderNovel } from "@/components/render-novel";
-import { Metadata } from "next";  
+import { Metadata } from "next";
 import BlogsSidebar from "@/components/blog-sidebar";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Script from "next/script";
 
 export async function generateMetadata({
   params,
@@ -94,8 +95,45 @@ export default async function Page(props: { params: paramsType }) {
     total: number;
   };
 
+  // JSON-LD для отдельной статьи
+  const blogPostingSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${process.env.NEXT_PUBLIC_API_URL}/blog/${blog.url}`,
+    },
+    headline: blog.title,
+    description: blog.metaDescription || blog.title,
+    datePublished: blog.date ? new Date(blog.date).toISOString() : undefined,
+    dateModified: blog.updatedAt
+      ? new Date(blog.updatedAt).toISOString()
+      : undefined,
+    author: {
+      "@type": "Person",
+      name: blog.author?.name || "Центр «Максимум»",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Спортивно-образовательный центр «Максимум»",
+      logo: {
+        "@type": "ImageObject",
+        url: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+      },
+    },
+    image: blog.images?.[0]
+      ? `${process.env.NEXT_PUBLIC_API_URL}/${blog.images[0]}`
+      : undefined,
+  };
+
   return (
     <>
+      <Script
+        type="application/ld+json"
+        id="blog-posting-schema"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }}
+      />
+
       <Navbar navlight={true} tagline={false} />
 
       <section

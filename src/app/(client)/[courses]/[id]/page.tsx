@@ -6,6 +6,7 @@ import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 
 export async function generateMetadata({
   params,
@@ -84,8 +85,46 @@ export default async function Page(props: { params: paramsType }) {
 
   const courses = await getAllCoursesPublic();
 
+  // JSON-LD для отдельного курса
+  const courseSchema = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.name,
+    description: course.description,
+    provider: {
+      "@type": "Organization",
+      name: "Спортивно-образовательный центр «Максимум»",
+      sameAs: `${process.env.NEXT_PUBLIC_API_URL}`,
+      logo: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+    },
+    url: `${process.env.NEXT_PUBLIC_API_URL}/${(await props.params).courses}/${
+      course.url
+    }`,
+    image: course.images?.[0]?.url
+      ? `${process.env.NEXT_PUBLIC_API_URL}${course.images[0].url}`
+      : undefined,
+    offers: {
+      "@type": "Offer",
+      price: course.price || "0",
+      priceCurrency: "BYN",
+      availability: "https://schema.org/InStock",
+    },
+    courseMode: "onsite",
+    about:
+      course.category && typeof course.category === "object"
+        ? course.category.name
+        : undefined,
+  };
+
   return (
     <>
+      <Script
+        type="application/ld+json"
+        id="course-schema"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
+
+
       <Navbar navlight={true} tagline={false} />
       {course && courses && (
         <CoursesDetailPage course={course} courses={courses.items} />

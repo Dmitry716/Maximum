@@ -11,13 +11,17 @@ import { getSeoSettingsByPageName } from "@/api/requests";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
+import Script from "next/script";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
   try {
     seoData = await getSeoSettingsByPageName("courses");
   } catch (error) {
-    console.error("Error fetching SEO data for courses, using defaults:", error);
+    console.error(
+      "Error fetching SEO data for courses, using defaults:",
+      error
+    );
   }
 
   const title = seoData?.metaTitle || `Курсы | Maximum`;
@@ -38,7 +42,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Если ogImage начинается с http:// или https:// — оставляем как есть
   // Иначе — добавляем базовый URL (если путь относительный)
-  if (ogImageUrl && !ogImageUrl.startsWith('http://') && !ogImageUrl.startsWith('https://')) {
+  if (
+    ogImageUrl &&
+    !ogImageUrl.startsWith("http://") &&
+    !ogImageUrl.startsWith("https://")
+  ) {
     ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
   }
 
@@ -61,7 +69,7 @@ export async function generateMetadata(): Promise<Metadata> {
           alt: title,
         },
       ],
-      locale: "ru_RU"
+      locale: "ru_RU",
     },
     twitter: {
       card: "summary_large_image",
@@ -86,11 +94,31 @@ export default async function Page(props: { params: paramsType }) {
   const ages = await getAllAges();
   const categories = await getCategories();
 
+  // JSON-LD для страницы "все курсы"
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Курсы | Maximum",
+    description:
+      "Найдите лучшие курсы для вашего ребенка в Maximum. Качественное образование и развитие навыков.",
+    url: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: [{ courses }],
+    },
+  };
+
   // Проверяем, является ли это маршрутом /courses
-  if (courses === 'courses') {
+  if (courses === "courses") {
     // Отображаем список всех курсов
     return (
       <>
+        <Script
+          type="application/ld+json"
+          id="courses-collection-schema"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+        />
+
         <Navbar navlight={false} tagline={false} />
 
         {/*  breadcrumb */}
@@ -122,7 +150,7 @@ export default async function Page(props: { params: paramsType }) {
 
         <section className="relative py-12">
           <div className="container relative">
-            <Courses ages={ages} categories={categories} ctg='' />
+            <Courses ages={ages} categories={categories} ctg="" />
           </div>
         </section>
 
@@ -137,13 +165,19 @@ export default async function Page(props: { params: paramsType }) {
   const categoryExists = categories.some((cat) => cat.id === courses);
 
   if (!categoryExists) {
-    redirect('/404'); // ✅ Редирект на /404
+    redirect("/404"); // ✅ Редирект на /404
   }
 
   // Если это существующая категория (например, /courses/programming)
   // Тогда отображаем список курсов, отфильтрованный по этой категории
   return (
     <>
+      <Script
+        type="application/ld+json"
+        id="courses-collection-schema"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
+      
       <Navbar navlight={false} tagline={false} />
 
       {/*  breadcrumb */}

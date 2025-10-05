@@ -8,31 +8,38 @@ import Footer from "@/components/footer";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { Metadata } from "next";
-import { getSeoSettingsByPageName } from '@/api/requests';
-import { SeoSetting as SeoSettingType } from '@/types/type';
+import { getSeoSettingsByPageName } from "@/api/requests";
+import { SeoSetting as SeoSettingType } from "@/types/type";
+import Script from "next/script";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
     // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName('about');
+    seoData = await getSeoSettingsByPageName("about");
   } catch (error) {
     console.error("Error fetching SEO data for about, using defaults:", error);
     // Просто продолжаем, seoData останется null
   }
 
   // Определяем значения: из API (из BlogPost) или дефолтные
-  const title = seoData?.metaTitle || "О нас | Спортивно-образовательный центр «Максимум» в Витебске";
-  const description = seoData?.metaDescription || "Спортивно-образовательный центр «Максимум» в Витебске — это профессиональные преподаватели, современные программы и индивидуальный подход. Узнайте о нашей миссии и достижениях!";
-  const keywords = seoData?.keywords ? seoData.keywords.split(",").filter(Boolean) : [
-    "о нас",
-    "спортивный центр Витебск",
-    "преподаватели",
-    "наши достижения",
-    "миссия центра",
-    "о Максимуме"
-  ];
+  const title =
+    seoData?.metaTitle ||
+    "О нас | Спортивно-образовательный центр «Максимум» в Витебске";
+  const description =
+    seoData?.metaDescription ||
+    "Спортивно-образовательный центр «Максимум» в Витебске — это профессиональные преподаватели, современные программы и индивидуальный подход. Узнайте о нашей миссии и достижениях!";
+  const keywords = seoData?.keywords
+    ? seoData.keywords.split(",").filter(Boolean)
+    : [
+        "о нас",
+        "спортивный центр Витебск",
+        "преподаватели",
+        "наши достижения",
+        "миссия центра",
+        "о Максимуме",
+      ];
 
   // Получаем ogImage из SEO-данных
   let ogImageUrl = seoData?.ogImage;
@@ -44,7 +51,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Если ogImage начинается с http:// или https:// — оставляем как есть
   // Иначе — добавляем базовый URL (если путь относительный)
-  if (ogImageUrl && !ogImageUrl.startsWith('http://') && !ogImageUrl.startsWith('https://')) {
+  if (
+    ogImageUrl &&
+    !ogImageUrl.startsWith("http://") &&
+    !ogImageUrl.startsWith("https://")
+  ) {
     ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
   }
   // Опционально: Используем изображение из SEO-данных, если оно есть, иначе дефолтное
@@ -54,8 +65,11 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     keywords,
     openGraph: {
-      title: seoData?.metaTitle || "О нас | Спортивный центр «Максимум» в Витебске", // Используем то же, что и в title
-      description: seoData?.metaDescription || "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!", // Используем то же, что и в description
+      title:
+        seoData?.metaTitle || "О нас | Спортивный центр «Максимум» в Витебске", // Используем то же, что и в title
+      description:
+        seoData?.metaDescription ||
+        "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!", // Используем то же, что и в description
       url: `${process.env.NEXT_PUBLIC_API_URL}/about`,
       type: "website",
       images: [
@@ -66,23 +80,74 @@ export async function generateMetadata(): Promise<Metadata> {
           alt: title,
         },
       ],
-      locale: "ru_RU"
+      locale: "ru_RU",
     },
     twitter: {
       card: "summary_large_image",
-      title: seoData?.metaTitle || "О нас | Спортивный центр «Максимум» в Витебске", // Используем то же, что и в title
-      description: seoData?.metaDescription || "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!", // Используем то же, что и в description
+      title:
+        seoData?.metaTitle || "О нас | Спортивный центр «Максимум» в Витебске", // Используем то же, что и в title
+      description:
+        seoData?.metaDescription ||
+        "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!", // Используем то же, что и в description
       images: [ogImageUrl],
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/about`,
     },
   };
-};
+}
 
 export default function Page() {
+  // JSON-LD для страницы "О нас"
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Спортивно-образовательный центр «Максимум»",
+    alternateName: "Максимум",
+    url: `${process.env.NEXT_PUBLIC_API_URL}`,
+    logo: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+    description:
+      "Спортивно-образовательный центр «Максимум» в Витебске — это профессиональные преподаватели, современные программы и индивидуальный подход.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Витебск",
+      addressCountry: "BY",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+375297800008",
+      contactType: "customer service",
+      availableLanguage: "ru",
+    },
+    sameAs: [
+      "https://www.facebook.com/maximus-center",
+      "https://www.instagram.com/maximus_center",
+    ],
+  };
+
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: "О нас | Спортивно-образовательный центр «Максимум»",
+    url: `${process.env.NEXT_PUBLIC_API_URL}/about`,
+    description:
+      "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!",
+    about: organizationSchema,
+  };
+
   return (
     <>
+      <Script
+        type="application/ld+json"
+        id="organization-about-schema"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <Script
+        type="application/ld+json"
+        id="webpage-about-schema"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+      />
+
       <Navbar navlight={true} tagline={false} />
 
       <section
