@@ -1,24 +1,27 @@
 import type { Metadata } from "next";
-import '../assets/scss/custom.scss'
-import "./globals.css"
-import "./prosemirror.css"
-import 'katex/dist/katex.min.css';
+import "../assets/scss/custom.scss";
+import "./globals.css";
+import "./prosemirror.css";
+import "katex/dist/katex.min.css";
 import "vanilla-cookieconsent/dist/cookieconsent.css";
 
 import { Providers } from "@/components/providers";
-import { cookies } from 'next/headers'
-import { verifyToken } from '@/lib/auth'
+import { cookies } from "next/headers";
+import { verifyToken } from "@/lib/auth";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import Head from "next/head";
 
 export const metadata: Metadata = {
-  title: "Спортивно-образовательный центр «Максимум» в Витебске | Тренировки, секции, обучение",
-  description: "Спортивно-образовательный центр «Максимум» в Витебске предлагает профессиональные тренировки, секции для детей, образовательные программы. Запишитесь онлайн на занятия!",
-  keywords: "спортивный центр Витебск, детские секции, тренировки для детей, образовательные программы, спорт в Витебске, Максимум Витебск",
+  title:
+    "Спортивно-образовательный центр «Максимум» в Витебске | Тренировки, секции, обучение",
+  description:
+    "Спортивно-образовательный центр «Максимум» в Витебске предлагает профессиональные тренировки, секции для детей, образовательные программы. Запишитесь онлайн на занятия!",
+  keywords:
+    "спортивный центр Витебск, детские секции, тренировки для детей, образовательные программы, спорт в Витебске, Максимум Витебск",
   openGraph: {
     title: "Спортивно-образовательный центр «Максимум» | Витебск",
-    description: "Профессиональные тренировки и образовательные программы в Витебске. Присоединяйтесь к нам!",
+    description:
+      "Профессиональные тренировки и образовательные программы в Витебске. Присоединяйтесь к нам!",
     type: "website",
     url: `${process.env.NEXT_PUBLIC_API_URL}`,
     images: [
@@ -28,12 +31,13 @@ export const metadata: Metadata = {
         height: 600,
         alt: "Спортивно-образовательный центр «Максимум» в Витебске",
       },
-    ]
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Спортивно-образовательный центр «Максимум» | Витебск",
-    description: "Профессиональные тренировки и образовательные программы в Витебске. Присоединяйтесь к нам!",
+    description:
+      "Профессиональные тренировки и образовательные программы в Витебске. Присоединяйтесь к нам!",
     images: [
       {
         url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/og.jpg`,
@@ -41,7 +45,7 @@ export const metadata: Metadata = {
         height: 600,
         alt: "Спортивно-образовательный центр «Максимум» в Витебске",
       },
-    ]
+    ],
   },
 };
 
@@ -50,35 +54,82 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const token = (await cookieStore).get("access_token")?.value;
 
-  const cookieStore = cookies()
-  const token = (await cookieStore).get('access_token')?.value
-
-  let user = null
+  let user = null;
 
   if (token) {
     try {
-      user = await verifyToken(token)
+      user = await verifyToken(token);
     } catch (e) {
-      user = null
+      user = null;
     }
   }
 
   return (
     <html lang="ru" className="scroll-smooth" dir="ltr">
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
-      </Head>
-      <body
-        className={` dark:bg-slate-900`}
-      >
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
+      />
+      {/* SVG как основной */}
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+      {/* PNG для широкой поддержки */}
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="/favicon-16x16.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon-32x32.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="96x96"
+        href="/favicon-96x96.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="/favicon-192x192.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="512x512"
+        href="/favicon-512x512.png"
+      />
+
+      {/* Apple */}
+      <link
+        rel="apple-touch-icon"
+        sizes="120x120"
+        href="/favicon-120x120.png"
+      />
+      <link
+        rel="apple-touch-icon"
+        sizes="152x152"
+        href="/favicon-152x152.png"
+      />
+      <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="/apple-touch-icon.png"
+      />
+      <link rel="manifest" href="/site.webmanifest" />
+      <body className={` dark:bg-slate-900`}>
         <ThemeProvider>
-          <Providers token={token} user={user}>{children}</Providers>
+          <Providers token={token} user={user}>
+            {children}
+          </Providers>
         </ThemeProvider>
         <Toaster />
       </body>

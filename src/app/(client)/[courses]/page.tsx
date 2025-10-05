@@ -7,30 +7,33 @@ import Switcher from "@/components/switcher";
 import { FiChevronRight } from "react-icons/fi";
 import Courses from "@/components/courses/courses";
 import { getAllAges, getCategories } from "@/api/requests";
-import { getSeoSettingsByPageName } from '@/api/requests';
-import { SeoSetting as SeoSettingType } from '@/types/type';
+import { getSeoSettingsByPageName } from "@/api/requests";
+import { SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
     // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName('courses'); 
+    seoData = await getSeoSettingsByPageName("courses");
   } catch (error) {
-    console.error("Error fetching SEO data for courses, using defaults:", error);
+    console.error(
+      "Error fetching SEO data for courses, using defaults:",
+      error
+    );
     // Просто продолжаем, seoData останется null
   }
 
   // Определяем значения: из API (из BlogPost) или дефолтные
   const title = seoData?.metaTitle || `Курсы | Maximum`;
-  const description = seoData?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum. Качественное образование и развитие навыков.`;
-  const keywords = seoData?.keywords ? seoData.keywords.split(",").filter(Boolean) : [
-    "курсы",
-    "образование",
-    "дети",
-    "развитие"
-  ];
+  const description =
+    seoData?.metaDescription ||
+    `Найдите лучшие курсы для вашего ребенка в Maximum. Качественное образование и развитие навыков.`;
+  const keywords = seoData?.keywords
+    ? seoData.keywords.split(",").filter(Boolean)
+    : ["курсы", "образование", "дети", "развитие"];
 
   return {
     title,
@@ -38,14 +41,18 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords,
     openGraph: {
       title: seoData?.metaTitle || `Курсы | Maximum`,
-      description: seoData?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum.`,
+      description:
+        seoData?.metaDescription ||
+        `Найдите лучшие курсы для вашего ребенка в Maximum.`,
       type: "website",
       url: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
     },
     twitter: {
       card: "summary_large_image",
       title: seoData?.metaTitle || `Курсы | Maximum`,
-      description: seoData?.metaDescription || `Найдите лучшие курсы для вашего ребенка в Maximum.`,
+      description:
+        seoData?.metaDescription ||
+        `Найдите лучшие курсы для вашего ребенка в Maximum.`,
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
@@ -61,6 +68,11 @@ export default async function Page(props: { params: paramsType }) {
   const { courses } = await props.params;
   const ages = await getAllAges();
   const categories = await getCategories();
+  const categoryExists = categories.some((cat) => cat.id === courses);
+
+  if (!categoryExists) {
+    notFound();
+  }
 
   return (
     <>
