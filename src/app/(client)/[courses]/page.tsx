@@ -10,7 +10,7 @@ import { getAllAges, getCategories } from "@/api/requests";
 import { getSeoSettingsByPageName } from "@/api/requests";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
@@ -113,7 +113,7 @@ export default async function Page(props: { params: paramsType }) {
   const categoryExists = categories.some((cat) => cat.id === courses);
 
   if (!categoryExists) {
-    notFound();
+    redirect('/404'); // ✅ Редирект на /404
   }
 
   // Если это существующая категория (например, /courses/programming)
