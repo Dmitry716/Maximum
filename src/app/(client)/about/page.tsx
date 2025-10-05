@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
     // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName('about'); 
+    seoData = await getSeoSettingsByPageName('about');
   } catch (error) {
     console.error("Error fetching SEO data for about, using defaults:", error);
     // Просто продолжаем, seoData останется null
@@ -34,6 +34,19 @@ export async function generateMetadata(): Promise<Metadata> {
     "о Максимуме"
   ];
 
+  // Получаем ogImage из SEO-данных
+  let ogImageUrl = seoData?.ogImage;
+
+  // Если ogImage не задан — используем дефолтное изображение
+  if (!ogImageUrl) {
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
+  }
+
+  // Если ogImage начинается с http:// или https:// — оставляем как есть
+  // Иначе — добавляем базовый URL (если путь относительный)
+  if (ogImageUrl && !ogImageUrl.startsWith('http://') && !ogImageUrl.startsWith('https://')) {
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+  }
   // Опционально: Используем изображение из SEO-данных, если оно есть, иначе дефолтное
 
   return {
@@ -43,13 +56,23 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: seoData?.metaTitle || "О нас | Спортивный центр «Максимум» в Витебске", // Используем то же, что и в title
       description: seoData?.metaDescription || "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!", // Используем то же, что и в description
-      type: "website",
       url: `${process.env.NEXT_PUBLIC_API_URL}/about`,
+      type: "website",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      locale: "ru_RU"
     },
     twitter: {
       card: "summary_large_image",
       title: seoData?.metaTitle || "О нас | Спортивный центр «Максимум» в Витебске", // Используем то же, что и в title
       description: seoData?.metaDescription || "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!", // Используем то же, что и в description
+      images: [ogImageUrl],
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/about`,

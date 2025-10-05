@@ -28,6 +28,20 @@ export async function generateMetadata(): Promise<Metadata> {
     ? seoData.keywords.split(",").filter(Boolean)
     : ["курсы", "образование", "дети", "развитие"];
 
+  // Получаем ogImage из SEO-данных
+  let ogImageUrl = seoData?.ogImage;
+
+  // Если ogImage не задан — используем дефолтное изображение
+  if (!ogImageUrl) {
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
+  }
+
+  // Если ogImage начинается с http:// или https:// — оставляем как есть
+  // Иначе — добавляем базовый URL (если путь относительный)
+  if (ogImageUrl && !ogImageUrl.startsWith('http://') && !ogImageUrl.startsWith('https://')) {
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+  }
+
   return {
     title,
     description,
@@ -37,8 +51,17 @@ export async function generateMetadata(): Promise<Metadata> {
       description:
         seoData?.metaDescription ||
         `Найдите лучшие курсы для вашего ребенка в Maximum.`,
-      type: "website",
       url: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
+      type: "website",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      locale: "ru_RU"
     },
     twitter: {
       card: "summary_large_image",
@@ -46,6 +69,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description:
         seoData?.metaDescription ||
         `Найдите лучшие курсы для вашего ребенка в Maximum.`,
+      images: [ogImageUrl],
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/courses`,

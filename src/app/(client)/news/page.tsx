@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
     // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName('courses'); 
+    seoData = await getSeoSettingsByPageName('courses');
   } catch (error) {
     console.error("Error fetching SEO data for courses, using defaults:", error);
     // Просто продолжаем, seoData останется null
@@ -37,6 +37,20 @@ export async function generateMetadata(): Promise<Metadata> {
     "достижения",
   ];
 
+  // Получаем ogImage из SEO-данных
+  let ogImageUrl = seoData?.ogImage;
+
+  // Если ogImage не задан — используем дефолтное изображение
+  if (!ogImageUrl) {
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
+  }
+
+  // Если ogImage начинается с http:// или https:// — оставляем как есть
+  // Иначе — добавляем базовый URL (если путь относительный)
+  if (ogImageUrl && !ogImageUrl.startsWith('http://') && !ogImageUrl.startsWith('https://')) {
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+  }
+
   return {
     title,
     description,
@@ -47,12 +61,21 @@ export async function generateMetadata(): Promise<Metadata> {
       url: `${process.env.NEXT_PUBLIC_API_URL}/news`,
       siteName: "Максимум",
       type: "website",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
       locale: "ru_RU",
     },
     twitter: {
       card: "summary_large_image",
       title: seoData?.metaTitle || "Новости | Центр «Максимум»", // Используем то же, что и в title
       description: seoData?.metaDescription || "Полезные материалы, советы и актуальные новости от спортивно-образовательного центра «Максимум» в Витебске.", // Используем то же, что и в description
+      images: [ogImageUrl],
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/news`,
