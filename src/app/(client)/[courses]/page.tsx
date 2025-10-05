@@ -15,18 +15,11 @@ import { notFound } from "next/navigation";
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
   try {
-    // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
-    // Передаем 'home' как pageName, так как это главная страница
     seoData = await getSeoSettingsByPageName("courses");
   } catch (error) {
-    console.error(
-      "Error fetching SEO data for courses, using defaults:",
-      error
-    );
-    // Просто продолжаем, seoData останется null
+    console.error("Error fetching SEO data for courses, using defaults:", error);
   }
 
-  // Определяем значения: из API (из BlogPost) или дефолтные
   const title = seoData?.metaTitle || `Курсы | Maximum`;
   const description =
     seoData?.metaDescription ||
@@ -68,12 +61,63 @@ export default async function Page(props: { params: paramsType }) {
   const { courses } = await props.params;
   const ages = await getAllAges();
   const categories = await getCategories();
+
+  // Проверяем, является ли это маршрутом /courses
+  if (courses === 'courses') {
+    // Отображаем список всех курсов
+    return (
+      <>
+        <Navbar navlight={false} tagline={false} />
+
+        {/*  breadcrumb */}
+        <section
+          id="courses"
+          className="relative py-5 bg-slate-50 dark:bg-slate-800 mt-[74px]"
+        >
+          <div className="container relative">
+            <div className="grid md:grid-cols-12 grid-cols-1 gap-2 items-center">
+              <div className="lg:col-span-5 md:col-span-4">
+                <h3 className="text-2xl md:leading-normal leading-normal font-semibold">
+                  Кружки и секции
+                </h3>
+              </div>
+
+              <div className="lg:col-span-7 md:col-span-8 md:text-end">
+                <ul className="tracking-[0.5px] mb-0 inline-flex items-center">
+                  <li className="inline-block text-slate-400 dark:text-white/60 duration-500 ease-in-out hover:text-violet-600 dark:hover:text-white">
+                    <Link href="/">Главная</Link>
+                  </li>
+                  <li className="inline-block text-slate-500 dark:text-white/60 mx-0.5 ltr:rotate-0 rtl:rotate-180">
+                    <FiChevronRight className="align-middle" />
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="relative py-12">
+          <div className="container relative">
+            <Courses ages={ages} categories={categories} ctg='' />
+          </div>
+        </section>
+
+        <Footer />
+        <ScrollToTop />
+        <Switcher />
+      </>
+    );
+  }
+
+  // Если это НЕ /courses, проверяем, является ли это существующей категорией
   const categoryExists = categories.some((cat) => cat.id === courses);
 
   if (!categoryExists) {
     notFound();
   }
 
+  // Если это существующая категория (например, /courses/programming)
+  // Тогда отображаем список курсов, отфильтрованный по этой категории
   return (
     <>
       <Navbar navlight={false} tagline={false} />
@@ -87,7 +131,7 @@ export default async function Page(props: { params: paramsType }) {
           <div className="grid md:grid-cols-12 grid-cols-1 gap-2 items-center">
             <div className="lg:col-span-5 md:col-span-4">
               <h3 className="text-2xl md:leading-normal leading-normal font-semibold">
-                Кружки и секции
+                Категория: {courses}
               </h3>
             </div>
 
@@ -95,6 +139,12 @@ export default async function Page(props: { params: paramsType }) {
               <ul className="tracking-[0.5px] mb-0 inline-flex items-center">
                 <li className="inline-block text-slate-400 dark:text-white/60 duration-500 ease-in-out hover:text-violet-600 dark:hover:text-white">
                   <Link href="/">Главная</Link>
+                </li>
+                <li className="inline-block text-slate-500 dark:text-white/60 mx-0.5 ltr:rotate-0 rtl:rotate-180">
+                  <FiChevronRight className="align-middle" />
+                </li>
+                <li className="inline-block text-slate-400 dark:text-white/60 duration-500 ease-in-out hover:text-violet-600 dark:hover:text-white">
+                  <Link href="/courses">Курсы</Link>
                 </li>
                 <li className="inline-block text-slate-500 dark:text-white/60 mx-0.5 ltr:rotate-0 rtl:rotate-180">
                   <FiChevronRight className="align-middle" />
