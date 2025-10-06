@@ -127,6 +127,26 @@ export default async function RootLayout({
           href="/apple-touch-icon.png"
         />
         <link rel="manifest" href="/site.webmanifest" />
+
+        {/* Google tag (gtag.js) */}
+        <Script
+          id="google-gtag"
+          src="https://www.googletagmanager.com/gtag/js?id=G-72GFKE1XQ2"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-gtag-config"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-72GFKE1XQ2');
+            `,
+          }}
+        />
+
         {/* Yandex.Metrika counter */}
         <Script
           id="yandex-metrika"
