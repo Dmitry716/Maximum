@@ -10,8 +10,14 @@ export function normalizeEditorValue(value: any) {
     try {
       return JSON.parse(value)
     } catch {
+      // Только в клиентской среде пытаемся использовать generateJSON
       if (typeof window !== "undefined") {
-        return generateJSON(value, [StarterKit])
+        try {
+          return generateJSON(value, [StarterKit])
+        } catch (error) {
+          console.error('Error generating JSON from HTML:', error);
+          return { type: "doc", content: [] }
+        }
       }
       return { type: "doc", content: [] } // server fallback
     }

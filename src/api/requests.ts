@@ -179,8 +179,20 @@ export async function getBlogByUrl(url: string) {
 }
 
 export async function getNewsByUrl(url: string) {
-  const { data } = await api.get(`/api/news/url/${url}`);
-  return data as NewsItem;
+  try {
+    console.log('Fetching news by URL:', url);
+    console.log('API base URL:', backendUrl);
+    console.log('Full URL:', `${backendUrl}/api/news/url/${url}`);
+    
+    const { data } = await api.get(`/api/news/url/${url}`);
+    console.log('Successfully fetched news data');
+    return data as NewsItem;
+  } catch (error: any) {
+    console.error('Error in getNewsByUrl:', error);
+    console.error('Error response status:', error.response?.status);
+    console.error('Error response data:', error.response?.data);
+    throw error;
+  }
 }
 
 export async function getAllCoursesByInstructor(instructorId: string) {

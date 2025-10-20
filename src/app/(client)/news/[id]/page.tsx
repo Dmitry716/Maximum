@@ -11,61 +11,73 @@ import { NewsItem } from "@/types/type";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { Metadata } from "next";
-import { RenderNovel } from "@/components/render-novel";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import { ClientRenderNovel } from "@/components/client-render-novel";
+import { ClientImage } from "@/components/client-image";
 
 export async function generateMetadata({
   params,
 }: {
   params: paramsType;
 }): Promise<Metadata> {
-  const { id } = await params;
-  if (!id) return {};
-  const news = await getNewsByUrl(id);
+  try {
+    const { id } = await params;
+    if (!id) return {};
+    
+    const news = await getNewsByUrl(id);
 
-  if (!news) return {};
+    if (!news) return {};
 
-  const imgPath = news.image ? news.image : null;
-  const imgUrl = imgPath
-    ? `${process.env.NEXT_PUBLIC_API_URL}/${imgPath}`
-    : null;
+    const imgPath = news.image ? news.image : null;
+    const imgUrl = imgPath
+      ? `${process.env.NEXT_PUBLIC_API_URL}/${imgPath}`
+      : null;
 
-  return {
-    title: news.metaTitle || news.title,
-    description: news.metaDescription || news.title,
-    keywords: news.keywords?.split(",").filter(Boolean) || [],
-    openGraph: {
+    return {
       title: news.metaTitle || news.title,
       description: news.metaDescription || news.title,
-      images: imgUrl ? [imgUrl] : [],
-      type: "article",
-      publishedTime: news.date ? new Date(news.date).toISOString() : undefined,
-      modifiedTime: news.updatedAt
-        ? new Date(news.updatedAt).toISOString()
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: news.metaTitle || news.title,
-      description: news.metaDescription || news.title,
-      images: imgUrl ? [imgUrl] : [],
-    },
-    alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/news/${id}`,
-    },
-  };
+      keywords: news.keywords?.split(",").filter(Boolean) || [],
+      openGraph: {
+        title: news.metaTitle || news.title,
+        description: news.metaDescription || news.title,
+        images: imgUrl ? [imgUrl] : [],
+        type: "article",
+        publishedTime: news.date ? new Date(news.date).toISOString() : undefined,
+        modifiedTime: news.updatedAt
+          ? new Date(news.updatedAt).toISOString()
+          : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: news.metaTitle || news.title,
+        description: news.metaDescription || news.title,
+        images: imgUrl ? [imgUrl] : [],
+      },
+      alternates: {
+        canonical: `${process.env.NEXT_PUBLIC_API_URL}/news/${id}`,
+      },
+    };
+  } catch (error: any) {
+    console.error('Error generating metadata:', error);
+    return {};
+  }
 }
 
 export async function generateStaticParams() {
-  const blogs = (await getNews(1, 1000, "published")) as {
-    items: NewsItem[];
-    total: number;
-  };
+  try {
+    const blogs = (await getNews(1, 1000, "published")) as {
+      items: NewsItem[];
+      total: number;
+    };
 
-  return blogs.items.map((blog) => ({
-    id: blog.url,
-  }));
+    return blogs.items.map((blog) => ({
+      id: blog.url,
+    }));
+  } catch (error: any) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
 }
 
 export const revalidate = 600;
@@ -80,22 +92,43 @@ export default async function Page({ params }: { params: paramsType }) {
   try {
     blog = await getNewsByUrl(id);
   } catch (error: any) {
+    console.error('Error fetching news:', error);
+    console.error('Error response:', error.response?.data);
+    console.error('Error status:', error.response?.status);
+    console.error('API URL being called:', `${process.env.NEXT_PUBLIC_API_URL}/api/news/url/${id}`);
+    
     if (error.response?.status === 404) return notFound();
     throw error;
   }
 
-  const relatedPosts = (await getNews(
-    1,
-    3,
-    "published",
-    blog.category,
-    blog.id
-  )) as { items: NewsItem[]; total: number };
+  if (!blog) {
+    console.error('Blog is null or undefined after successful API call');
+    return notFound();
+  }
 
-  const latestPosts = (await getNews(1, 5, "published")) as {
-    items: NewsItem[];
-    total: number;
-  };
+  let relatedPosts: { items: NewsItem[]; total: number } = { items: [], total: 0 };
+  let latestPosts: { items: NewsItem[]; total: number } = { items: [], total: 0 };
+
+  try {
+    relatedPosts = (await getNews(
+      1,
+      3,
+      "published",
+      blog.category,
+      blog.id
+    )) as { items: NewsItem[]; total: number };
+  } catch (error: any) {
+    console.error('Error fetching related posts:', error);
+  }
+
+  try {
+    latestPosts = (await getNews(1, 5, "published")) as {
+      items: NewsItem[];
+      total: number;
+    };
+  } catch (error: any) {
+    console.error('Error fetching latest posts:', error);
+  }
 
   // JSON-LD для отдельной новости
   const newsArticleSchema = {
@@ -182,15 +215,17 @@ export default async function Page({ params }: { params: paramsType }) {
           <div className="grid lg:grid-cols-12 md:grid-cols-2 grid-cols-1 gap-6">
             <div className="lg:col-span-8 md:order-1 order-2">
               <div className="relative lg:p-6 md:p-4 p-2 overflow-hidden rounded-xl shadow dark:shadow-gray-800">
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_API_URL}/${blog?.image}`}
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  style={{ width: "100%", height: "auto" }}
-                  alt=""
-                />
-                {blog?.content && <RenderNovel contentFromDB={blog?.content} />}
+                {blog?.image && (
+                  <ClientImage
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/${blog?.image}`}
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    style={{ width: "100%", height: "auto" }}
+                    alt={blog.title || ""}
+                  />
+                )}
+                {blog?.content && <ClientRenderNovel contentFromDB={blog?.content} />}
               </div>
             </div>
 

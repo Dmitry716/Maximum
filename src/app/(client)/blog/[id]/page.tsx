@@ -8,12 +8,12 @@ import { getBlogByUrl, getBlogs } from "@/api/requests";
 import { Blog as BlogType } from "@/types/type";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { RenderNovel } from "@/components/render-novel";
 import { Metadata } from "next";
 import BlogsSidebar from "@/components/blog-sidebar";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Script from "next/script";
+import { ClientRenderNovel } from "@/components/client-render-novel";
 
 export async function generateMetadata({
   params,
@@ -187,13 +187,11 @@ export default async function Page(props: { params: paramsType }) {
                     height={700}
                     className="object-contain"
                     alt="blog images"
-                  />
-                )}
-                {blog?.content && <RenderNovel contentFromDB={blog?.content} />}
-              </div>
-            </div>
-
-            <div className="lg:col-span-4 ">
+          />
+        )}
+        {blog?.content && <ClientRenderNovel contentFromDB={blog?.content} />}
+      </div>
+    </div>            <div className="lg:col-span-4 ">
               {latestPosts && (
                 <BlogsSidebar
                   title={"Недавние посты"}
