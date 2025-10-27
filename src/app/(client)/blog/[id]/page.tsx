@@ -4,7 +4,7 @@ import Blog from "@/components/blog";
 import Footer from "@/components/footer";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { getBlogByUrl, getBlogs } from "@/api/requests";
+import { getBlogByUrlServer, getBlogsServer } from "@/api/server-requests";
 import { Blog as BlogType } from "@/types/type";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -20,55 +20,67 @@ export async function generateMetadata({
 }: {
   params: paramsType;
 }): Promise<Metadata> {
-  const { id } = await params;
-  if (!id) return {};
-  const blog = await getBlogByUrl(id);
+  try {
+    const { id } = await params;
+    if (!id) return {};
+    const blog = await getBlogByUrlServer(id);
 
-  if (!blog) return {};
+    if (!blog) return {};
 
-  const imgPath = blog.images?.length > 0 ? blog.images[0] : null;
-  const imgUrl = imgPath
-    ? `${process.env.NEXT_PUBLIC_API_URL}/${imgPath}`
-    : null;
+    const imgPath = blog.images?.length > 0 ? blog.images[0] : null;
+    const imgUrl = imgPath
+      ? `${process.env.NEXT_PUBLIC_API_URL}/${imgPath}`
+      : null;
 
-  return {
-    title: blog.metaTitle || blog.title,
-    description: blog.metaDescription || blog.title,
-    keywords: blog.keywords?.split(",").filter(Boolean) || [],
-    openGraph: {
+    return {
       title: blog.metaTitle || blog.title,
       description: blog.metaDescription || blog.title,
-      images: imgUrl ? [imgUrl] : [],
-      type: "article",
-      publishedTime: blog.date ? new Date(blog.date).toISOString() : undefined,
-      modifiedTime: blog.updatedAt
-        ? new Date(blog.updatedAt).toISOString()
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: blog.metaTitle || blog.title,
-      description: blog.metaDescription || blog.title,
-      images: imgUrl ? [imgUrl] : [],
-    },
-    alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/blog/${id}`,
-    },
-  };
+      keywords: blog.keywords?.split(",").filter(Boolean) || [],
+      openGraph: {
+        title: blog.metaTitle || blog.title,
+        description: blog.metaDescription || blog.title,
+        images: imgUrl ? [imgUrl] : [],
+        type: "article",
+        publishedTime: blog.date ? new Date(blog.date).toISOString() : undefined,
+        modifiedTime: blog.updatedAt
+          ? new Date(blog.updatedAt).toISOString()
+          : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: blog.metaTitle || blog.title,
+        description: blog.metaDescription || blog.title,
+        images: imgUrl ? [imgUrl] : [],
+      },
+      alternates: {
+        canonical: `https://maxximum.by/blog/${id}`,
+      },
+    };
+  } catch (error: any) {
+    console.error('Error generating metadata for blog:', error);
+    // Возвращаем базовые метаданные в случае ошибки
+    return {
+      title: 'Блог - Центр Максимум',
+      description: 'Спортивно-образовательный центр Максимум',
+    };
+  }
 }
 
 export async function generateStaticParams() {
-  const blogs = (await getBlogs(1, 1000, "published")) as {
-    items: BlogType[];
-    total: number;
-  };
+  try {
+    const blogs = await getBlogsServer(1, 100, "published"); // Уменьшили до 100 для быстрой сборки
 
-  return blogs.items.map((blog) => ({
-    id: blog.url,
-  }));
+    return blogs.items.map((blog) => ({
+      id: blog.url,
+    }));
+  } catch (error: any) {
+    console.error('Error generating static params for blogs:', error);
+    return []; // Возвращаем пустой массив в случае ошибки
+  }
 }
 
-export const revalidate = 600;
+export const revalidate = 600; // 10 минут  
+export const dynamicParams = true; // Разрешить динамические параметры
 
 export type paramsType = Promise<{ id: string }>;
 
@@ -77,23 +89,22 @@ export default async function Page(props: { params: paramsType }) {
 
   let blog = null;
   try {
-    blog = await getBlogByUrl(id);
+    blog = await getBlogByUrlServer(id);
   } catch (error: any) {
-    if (error.response?.status === 404) return notFound();
+    if (error.message?.includes('Blog not found') || error.message?.includes('404')) {
+      return notFound();
+    }
     throw error;
   }
-  const relatedPosts = (await getBlogs(
+  const relatedPosts = await getBlogsServer(
     1,
     3,
     "published",
     blog.category,
     blog.id
-  )) as { items: BlogType[]; total: number };
+  );
 
-  const latestPosts = (await getBlogs(1, 5, "published")) as {
-    items: BlogType[];
-    total: number;
-  };
+  const latestPosts = await getBlogsServer(1, 5, "published");
 
   // JSON-LD для отдельной статьи
   const blogPostingSchema = {
@@ -101,7 +112,7 @@ export default async function Page(props: { params: paramsType }) {
     "@type": "BlogPosting",
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${process.env.NEXT_PUBLIC_API_URL}/blog/${blog.url}`,
+      "@id": `https://maxximum.by/blog/${blog.url}`,
     },
     headline: blog.title,
     description: blog.metaDescription || blog.title,

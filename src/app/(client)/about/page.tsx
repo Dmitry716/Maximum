@@ -8,7 +8,7 @@ import Footer from "@/components/footer";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { Metadata } from "next";
-import { getSeoSettingsByPageName } from "@/api/requests";
+import { getSeoSettingsByPageNameServer } from "@/api/server-requests";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import Script from "next/script";
 
@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
     // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName("about");
+    seoData = await getSeoSettingsByPageNameServer("about");
   } catch (error) {
     console.error("Error fetching SEO data for about, using defaults:", error);
     // Просто продолжаем, seoData останется null

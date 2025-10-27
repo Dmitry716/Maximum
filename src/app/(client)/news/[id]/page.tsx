@@ -6,7 +6,7 @@ import Blog from "@/components/blog";
 import Footer from "@/components/footer";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { getNews, getNewsByUrl } from "@/api/requests";
+import { getNewsServer, getNewsByUrlServer } from "@/api/server-requests";
 import { NewsItem } from "@/types/type";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -25,7 +25,7 @@ export async function generateMetadata({
     const { id } = await params;
     if (!id) return {};
     
-    const news = await getNewsByUrl(id);
+    const news = await getNewsByUrlServer(id);
 
     if (!news) return {};
 
@@ -55,32 +55,34 @@ export async function generateMetadata({
         images: imgUrl ? [imgUrl] : [],
       },
       alternates: {
-        canonical: `${process.env.NEXT_PUBLIC_API_URL}/news/${id}`,
+        canonical: `https://maxximum.by/news/${id}`,
       },
     };
   } catch (error: any) {
-    console.error('Error generating metadata:', error);
-    return {};
+    console.error('Error generating metadata for news:', error);
+    // Возвращаем базовые метаданные в случае ошибки
+    return {
+      title: 'Новость - Центр Максимум',
+      description: 'Спортивно-образовательный центр Максимум',
+    };
   }
 }
 
 export async function generateStaticParams() {
   try {
-    const blogs = (await getNews(1, 1000, "published")) as {
-      items: NewsItem[];
-      total: number;
-    };
+    const blogs = await getNewsServer(1, 100, "published"); // Уменьшили до 100 для быстрой сборки
 
     return blogs.items.map((blog) => ({
       id: blog.url,
     }));
   } catch (error: any) {
     console.error('Error generating static params:', error);
-    return [];
+    return []; // Возвращаем пустой массив в случае ошибки
   }
 }
 
-export const revalidate = 600;
+export const revalidate = 600; // 10 минут
+export const dynamicParams = true; // Разрешить динамические параметры
 
 export type paramsType = Promise<{ id: string }>;
 
@@ -90,14 +92,14 @@ export default async function Page({ params }: { params: paramsType }) {
   let blog = null;
 
   try {
-    blog = await getNewsByUrl(id);
+    blog = await getNewsByUrlServer(id);
   } catch (error: any) {
     console.error('Error fetching news:', error);
-    console.error('Error response:', error.response?.data);
-    console.error('Error status:', error.response?.status);
     console.error('API URL being called:', `${process.env.NEXT_PUBLIC_API_URL}/api/news/url/${id}`);
     
-    if (error.response?.status === 404) return notFound();
+    if (error.message?.includes('News not found') || error.message?.includes('404')) {
+      return notFound();
+    }
     throw error;
   }
 
@@ -110,22 +112,19 @@ export default async function Page({ params }: { params: paramsType }) {
   let latestPosts: { items: NewsItem[]; total: number } = { items: [], total: 0 };
 
   try {
-    relatedPosts = (await getNews(
+    relatedPosts = await getNewsServer(
       1,
       3,
       "published",
       blog.category,
       blog.id
-    )) as { items: NewsItem[]; total: number };
+    );
   } catch (error: any) {
     console.error('Error fetching related posts:', error);
   }
 
   try {
-    latestPosts = (await getNews(1, 5, "published")) as {
-      items: NewsItem[];
-      total: number;
-    };
+    latestPosts = await getNewsServer(1, 5, "published");
   } catch (error: any) {
     console.error('Error fetching latest posts:', error);
   }
@@ -136,7 +135,7 @@ export default async function Page({ params }: { params: paramsType }) {
     "@type": "NewsArticle",
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${process.env.NEXT_PUBLIC_API_URL}/news/${blog.url}`,
+      "@id": `https://maxximum.by/news/${blog.url}`,
     },
     headline: blog.title,
     description: blog.metaDescription || blog.title,

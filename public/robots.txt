@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Основная карта сайта
+Sitemap: https://maxximum.by/sitemap.xml
+
+# Блокируем административные разделы
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Блокируем дублирующиеся страницы
+Disallow: /*?*
+Disallow: /*/*/page/*
+
+# Разрешаем основные разделы
+Allow: /news/
+Allow: /blog/
+Allow: /courses/
+Allow: /about
+Allow: /contact

@@ -12,7 +12,7 @@ import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { Metadata } from "next";
 import { SeoSetting as SeoSettingType } from "@/types/type";
-import { getSeoSettingsByPageName } from "@/api/requests";
+import { getSeoSettingsByPageNameServer } from "@/api/server-requests";
 import Script from "next/script";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
     // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName("home");
+    seoData = await getSeoSettingsByPageNameServer("home");
   } catch (error) {
     console.error(
       "Error fetching SEO data for homepage, using defaults:",
