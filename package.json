@@ -8,9 +8,7 @@
     "build": "next build",
     "start": "next start -p 3001",
     "export": "next build && next export",
-    "lint": "next lint",
-    "check-seo": "node scripts/check-seo.js",
-    "check-seo:production": "node scripts/check-seo.js https://maxximum.by"
+    "lint": "next lint"
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.12",
