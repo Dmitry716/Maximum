@@ -14,40 +14,30 @@ import { Metadata } from "next";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import { getSeoSettingsByPageNameServer } from "@/api/server-requests";
 import Script from "next/script";
+import { getSeoFallback } from "@/lib/seo-fallback";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
   try {
     // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
-    // Передаем 'home' как pageName, так как это главная страница
     seoData = await getSeoSettingsByPageNameServer("home");
   } catch (error) {
-    console.error(
-      "Error fetching SEO data for homepage, using defaults:",
-      error
-    );
+    // Ошибки уже обрабатываются в getSeoSettingsByPageNameServer
     // Просто продолжаем, seoData останется null
   }
 
-  // Определяем значения: из API (из BlogPost) или дефолтные
-  const title =
-    seoData?.metaTitle ||
-    "Спортивно-образовательный центр «Максимум» в Витебске";
-  const description =
-    seoData?.metaDescription ||
-    "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.";
+  // Если данные не получены, используем fallback
+  const fallback = getSeoFallback("home");
+
+  // Определяем значения: из API или из fallback
+  const title = seoData?.metaTitle || fallback.metaTitle;
+  const description = seoData?.metaDescription || fallback.metaDescription;
   const keywords = seoData?.keywords
     ? seoData.keywords.split(",").filter(Boolean)
-    : [
-        "спортивный центр Витебск",
-        "образовательный центр Максимум",
-        "детские курсы Витебск",
-        "развитие детей Витебск",
-        "спорт и образование",
-      ];
+    : fallback.keywords.split(",").filter(Boolean);
 
-  // Получаем ogImage из SEO-данных
-  let ogImageUrl = seoData?.ogImage;
+  // Получаем ogImage из SEO-данных или fallback
+  let ogImageUrl = seoData?.ogImage || fallback.ogImage;
 
   // Если ogImage не задан — используем дефолтное изображение
   if (!ogImageUrl) {
@@ -69,12 +59,8 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     keywords,
     openGraph: {
-      title:
-        seoData?.metaTitle ||
-        "Спортивно-образовательный центр «Максимум» в Витебске",
-      description:
-        seoData?.metaDescription ||
-        "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.",
+      title,
+      description,
       type: "website",
       url: `${process.env.NEXT_PUBLIC_API_URL}/`, // URL главной страницы
       images: [
@@ -89,12 +75,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title:
-        seoData?.metaTitle ||
-        "Спортивно-образовательный центр «Максимум» в Витебске",
-      description:
-        seoData?.metaDescription ||
-        "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске.",
+      title,
+      description,
       images: [ogImageUrl],
     },
     alternates: {

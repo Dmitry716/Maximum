@@ -80,13 +80,24 @@ export async function getBlogsServer(
 
 export async function getSeoSettingsByPageNameServer(pageName: string) {
   try {
+    // Проверяем доступность API во время сборки
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      console.warn(`API URL not configured, skipping SEO data for page '${pageName}'`);
+      return null;
+    }
+
     return await serverGet(`/api/seo/${pageName}`, { revalidate: 3600 }); // 1 час
   } catch (error: any) {
-    console.error(`Error fetching SEO data for page '${pageName}':`, error);
+    // Логируем только в development режиме для уменьшения шума в сборке
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`Error fetching SEO data for page '${pageName}':`, error);
+    }
     
     // Обрабатываем различные типы ошибок
     if (error.message.includes('404') || error.message.includes('HTTP error! status: 404')) {
-      console.warn(`SEO data for page '${pageName}' not found (404).`);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`SEO data for page '${pageName}' not found (404).`);
+      }
       return null;
     }
     
@@ -94,9 +105,17 @@ export async function getSeoSettingsByPageNameServer(pageName: string) {
       console.warn(`Invalid SEO response for page '${pageName}', using defaults.`);
       return null;
     }
+
+    // Особая обработка для сетевых ошибок во время сборки
+    if (error.message.includes('fetch failed') || error.message.includes('ECONNREFUSED') || error.message.includes('network')) {
+      console.warn(`SEO API not available during build for page '${pageName}', using defaults.`);
+      return null;
+    }
     
     // Для других ошибок тоже возвращаем null, чтобы не ломать сборку
-    console.warn(`SEO fetch failed for page '${pageName}', using defaults.`);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`SEO fetch failed for page '${pageName}', using defaults.`);
+    }
     return null;
   }
 }
