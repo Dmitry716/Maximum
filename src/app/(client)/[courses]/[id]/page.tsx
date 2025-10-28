@@ -59,13 +59,17 @@ export async function generateMetadata({
 export async function generateStaticParams() {
   const courses = await getAllCoursesPublic({ limit: 1000, page: 1 });
 
-  return courses.items.map((course) => ({
-    id: course.url,
-    courses:
-      course.category && typeof course.category !== "string"
-        ? course.category.url
-        : "courses",
-  }));
+  return courses.items
+    .filter((course) => 
+      course.category && 
+      typeof course.category !== "string" && 
+      course.category.url && 
+      course.category.url !== "courses"
+    )
+    .map((course) => ({
+      id: course.url,
+      courses: (course.category as any)?.url,
+    }));
 }
 
 export const revalidate = 600;

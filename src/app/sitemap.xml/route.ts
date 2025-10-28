@@ -20,17 +20,21 @@ export async function GET() {
     ({ createdAt, category, url }) => {
       const lastmod = new Date(createdAt).toISOString();
 
-      const categoryUrl = typeof category === 'object' ? category?.url ?? '' : (category ?? '');
-      const loc = `${Url}/${categoryUrl}/${url ?? ''}`;
-
-      return [
-        {
-          loc,
-          lastmod,
-          changefreq: "monthly",
-          priority: "0.9" as any, 
-        },
-      ];
+      // Генерируем URL только для курсов с категорией (не "courses")
+      if (category && typeof category === 'object' && category.url && category.url !== "courses") {
+        const loc = `${Url}/${category.url}/${url ?? ''}`;
+        return [
+          {
+            loc,
+            lastmod,
+            changefreq: "monthly",
+            priority: "0.9" as any, 
+          },
+        ];
+      }
+      
+      // Для курсов без категории или с категорией "courses" - не добавляем в sitemap
+      return [];
     },
   );
 
