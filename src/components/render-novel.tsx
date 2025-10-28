@@ -29,6 +29,7 @@ export const RenderNovel = ({ contentFromDB }: { contentFromDB: string }) => {
       initialContent={content}
       editable={false}
       extensions={defaultExtensions}
+      immediatelyRender={false}
     />
   )
 }
