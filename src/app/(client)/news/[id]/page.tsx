@@ -13,7 +13,7 @@ import { ru } from "date-fns/locale";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import { ClientRenderNovel } from "@/components/client-render-novel";
+import { ClientOnlyRenderNovel } from "@/components/client-only-render-novel";
 import { ClientImage } from "@/components/client-image";
 
 export async function generateMetadata({
@@ -224,7 +224,7 @@ export default async function Page({ params }: { params: paramsType }) {
                     alt={blog.title || ""}
                   />
                 )}
-                {blog?.content && <ClientRenderNovel contentFromDB={blog?.content} />}
+                {blog?.content && <ClientOnlyRenderNovel contentFromDB={blog?.content} />}
               </div>
             </div>
 

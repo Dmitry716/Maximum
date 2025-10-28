@@ -13,7 +13,7 @@ import BlogsSidebar from "@/components/blog-sidebar";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Script from "next/script";
-import { ClientRenderNovel } from "@/components/client-render-novel";
+import { ClientOnlyRenderNovel } from "@/components/client-only-render-novel";
 
 export async function generateMetadata({
   params,
@@ -200,7 +200,7 @@ export default async function Page(props: { params: paramsType }) {
                     alt="blog images"
           />
         )}
-        {blog?.content && <ClientRenderNovel contentFromDB={blog?.content} />}
+        {blog?.content && <ClientOnlyRenderNovel contentFromDB={blog?.content} />}
       </div>
     </div>            <div className="lg:col-span-4 ">
               {latestPosts && (

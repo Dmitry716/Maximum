@@ -5,7 +5,7 @@ import { FiClock } from 'react-icons/fi'
 import { Course } from '@/types/type'
 import { ScheduleGroup } from '../schedule-group'
 import { RegisterApp } from '../register-app'
-import { ClientRenderNovel } from '../client-render-novel'
+import { ClientOnlyRenderNovel } from '../client-only-render-novel'
 
 export default function CoursesDetailPage({ course, courses }: { course: Course, courses: Course[] }) {
 
@@ -57,7 +57,7 @@ export default function CoursesDetailPage({ course, courses }: { course: Course,
             <p className=' dark:text-slate-300'>{course.description}</p>
 
             {course?.detailedDescription
-              && <ClientRenderNovel
+              && <ClientOnlyRenderNovel
                 contentFromDB={course.detailedDescription}
               />}
 
