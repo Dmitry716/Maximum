@@ -15,12 +15,12 @@ import Script from "next/script";
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
   try {
-    // Используем НОВУЮ функцию для получения SEO-данных для общей страницы
-    // Передаем 'home' как pageName, так как это главная страница
-    seoData = await getSeoSettingsByPageName("courses");
+    // Используем НОВУЮ функцию для получения SEO-данных для страницы новостей
+    // Передаем 'news' как pageName, так как это страница новостей
+    seoData = await getSeoSettingsByPageName("news");
   } catch (error) {
     console.error(
-      "Error fetching SEO data for courses, using defaults:",
+      "Error fetching SEO data for news, using defaults:",
       error
     );
     // Просто продолжаем, seoData останется null
