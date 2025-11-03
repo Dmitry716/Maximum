@@ -18,12 +18,43 @@ export async function getNewsByUrlServer(url: string): Promise<NewsItem> {
 
 export async function getBlogByUrlServer(url: string): Promise<Blog> {
   try {
-    return await serverGet(`/api/blog/url/${url}`, { revalidate: 600 }); // 10 минут
+    const result = await serverGet(`/api/blog/url/${url}`, { revalidate: 600 }); // 10 минут
+    
+    // Дополнительная проверка на случай пустого или некорректного ответа
+    if (!result || typeof result !== 'object') {
+      throw new Error('Invalid blog data received');
+    }
+    
+    return result;
   } catch (error: any) {
     console.error(`Error fetching blog by URL '${url}':`, error);
+    console.error(`Full URL being called: ${process.env.NEXT_PUBLIC_API_URL}/api/blog/url/${url}`);
     
-    if (error.message.includes('404') || error.message.includes('HTTP error! status: 404')) {
+    // Обрабатываем различные типы ошибок
+    if (error.message.includes('404') || 
+        error.message.includes('HTTP error! status: 404') ||
+        error.message.includes('Blog not found')) {
       throw new Error('Blog not found');
+    }
+    
+    if (error.message.includes('500') || error.message.includes('HTTP error! status: 500')) {
+      console.error(`Server error (500) when fetching blog '${url}'`);
+      throw new Error('Server error while fetching blog');
+    }
+    
+    if (error.message.includes('Empty response') || 
+        error.message.includes('Invalid JSON') ||
+        error.message.includes('Invalid blog data')) {
+      console.error(`Invalid response when fetching blog '${url}'`);
+      throw new Error('Invalid blog data received');
+    }
+    
+    // Сетевые ошибки
+    if (error.message.includes('fetch failed') || 
+        error.message.includes('network') || 
+        error.message.includes('ECONNREFUSED')) {
+      console.error(`Network error when fetching blog '${url}'`);
+      throw new Error('Network error while fetching blog');
     }
     
     throw error; // Пробрасываем другие ошибки

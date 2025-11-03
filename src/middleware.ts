@@ -7,6 +7,13 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get('access_token')?.value
   const { pathname } = req.nextUrl
 
+  // Логирование для диагностики блога
+  if (pathname.startsWith('/blog/') && process.env.NODE_ENV === 'production') {
+    console.log(`[Middleware] Blog request: ${pathname}`)
+    console.log(`[Middleware] User-Agent: ${req.headers.get('user-agent')}`)
+    console.log(`[Middleware] Host: ${req.headers.get('host')}`)
+  }
+
   if (!token && pathname.startsWith('/dashboard') || !token && pathname.startsWith('/profile')) {
     return NextResponse.redirect(new URL('/', req.url))
   }

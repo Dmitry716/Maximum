@@ -13,7 +13,7 @@ import BlogsSidebar from "@/components/blog-sidebar";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Script from "next/script";
-import { ClientOnlyRenderNovel } from "@/components/client-only-render-novel";
+import { ClientRenderNovel } from "@/components/client-render-novel";
 
 export async function generateMetadata({
   params,
@@ -66,20 +66,22 @@ export async function generateMetadata({
   }
 }
 
-export async function generateStaticParams() {
-  try {
-    const blogs = await getBlogsServer(1, 100, "published"); // Уменьшили до 100 для быстрой сборки
+// Временно отключаем статическую генерацию для диагностики
+// export async function generateStaticParams() {
+//   try {
+//     const blogs = await getBlogsServer(1, 100, "published"); // Уменьшили до 100 для быстрой сборки
 
-    return blogs.items.map((blog) => ({
-      id: blog.url,
-    }));
-  } catch (error: any) {
-    console.error('Error generating static params for blogs:', error);
-    return []; // Возвращаем пустой массив в случае ошибки
-  }
-}
+//     return blogs.items.map((blog) => ({
+//       id: blog.url,
+//     }));
+//   } catch (error: any) {
+//     console.error('Error generating static params for blogs:', error);
+//     return []; // Возвращаем пустой массив в случае ошибки
+//   }
+// }
 
-export const revalidate = 600; // 10 минут  
+export const dynamic = 'force-dynamic'; // Принудительно делаем страницу динамической
+export const revalidate = 0; // Отключаем кеширование для диагностики
 export const dynamicParams = true; // Разрешить динамические параметры
 
 export type paramsType = Promise<{ id: string }>;
@@ -90,21 +92,51 @@ export default async function Page(props: { params: paramsType }) {
   let blog = null;
   try {
     blog = await getBlogByUrlServer(id);
-  } catch (error: any) {
-    if (error.message?.includes('Blog not found') || error.message?.includes('404')) {
+    
+    // Дополнительная проверка на корректность данных
+    if (!blog || !blog.title) {
+      console.error('Blog data is incomplete:', blog);
       return notFound();
     }
-    throw error;
+  } catch (error: any) {
+    console.error('Error in blog page component:', error);
+    console.error('Blog ID:', id);
+    console.error('API URL:', process.env.NEXT_PUBLIC_API_URL);
+    
+    if (error.message?.includes('Blog not found') || 
+        error.message?.includes('404') ||
+        error.message?.includes('Invalid blog data')) {
+      return notFound();
+    }
+    
+    // Для других ошибок (500, сетевые) тоже показываем 404, чтобы не ломать сайт
+    console.error('Unexpected error, returning 404:', error.message);
+    return notFound();
   }
-  const relatedPosts = await getBlogsServer(
-    1,
-    3,
-    "published",
-    blog.category,
-    blog.id
-  );
 
-  const latestPosts = await getBlogsServer(1, 5, "published");
+  // Безопасное получение связанных постов
+  let relatedPosts: { items: BlogType[]; total: number } = { items: [], total: 0 };
+  try {
+    relatedPosts = await getBlogsServer(
+      1,
+      3,
+      "published",
+      blog.category,
+      blog.id
+    );
+  } catch (error: any) {
+    console.error('Error fetching related posts:', error);
+    // Продолжаем без связанных постов
+  }
+
+  // Безопасное получение последних постов
+  let latestPosts: { items: BlogType[]; total: number } = { items: [], total: 0 };
+  try {
+    latestPosts = await getBlogsServer(1, 5, "published");
+  } catch (error: any) {
+    console.error('Error fetching latest posts:', error);
+    // Продолжаем без последних постов
+  }
 
   // JSON-LD для отдельной статьи
   const blogPostingSchema = {
@@ -200,7 +232,7 @@ export default async function Page(props: { params: paramsType }) {
                     alt="blog images"
           />
         )}
-        {blog?.content && <ClientOnlyRenderNovel contentFromDB={blog?.content} />}
+        {blog?.content && <ClientRenderNovel contentFromDB={blog?.content} />}
       </div>
     </div>            <div className="lg:col-span-4 ">
               {latestPosts && (

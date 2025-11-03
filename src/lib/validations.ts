@@ -5,8 +5,8 @@ export const blogFormSchema = z.object({
   title: z.string().min(1, "Название обязательно"),
   content: z.string().min(10, "Описание должно быть не менее 10 символов"),
   images: z.array(z.string().min(1, "Изображение обязательно"))
-    .min(1, "Минимум 1 изображение")
-    .max(5, "Максимум 5 изображений"),
+    .max(5, "Максимум 5 изображений")
+    .default([]), // Позволяем пустой массив
   category: z.string().min(1, "Категория обязательна"),
   authorId: z.number().min(1, "Автор обязателен"),
   status: z.nativeEnum(BlogPostStatus, {
@@ -16,10 +16,20 @@ export const blogFormSchema = z.object({
     (val) => (val === "" ? null : val),
     z.string().nullable().optional()
   ),
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).default([]),
   metaTitle: z.string().nullable().optional(),
   metaDescription: z.string().nullable().optional(),
   keywords: z.string().nullable().optional(),
+})
+.refine((data) => {
+  // Если статус "published", то изображения обязательны
+  if (data.status === BlogPostStatus.PUBLISHED) {
+    return data.images.length >= 1;
+  }
+  return true;
+}, {
+  message: "Для публикации поста необходимо добавить минимум 1 изображение",
+  path: ["images"]
 });
 
 export const courseFormSchema = z.object({
