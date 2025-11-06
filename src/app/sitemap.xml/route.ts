@@ -3,6 +3,10 @@ import { getAllBlogsPublic } from "@/api/requests";
 import { getAllNewsPublic } from "@/api/requests";
 import { getServerSideSitemap, ISitemapField } from "next-sitemap";
 
+// Ensure sitemap is always fresh, not cached
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   const Url = process.env.NEXT_PUBLIC_API_URL!;
   
