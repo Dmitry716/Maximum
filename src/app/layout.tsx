@@ -10,6 +10,7 @@ import { verifyToken } from "@/lib/auth";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { MetadataHead } from "@/components/metadata-head";
+import { DebugMetaTags } from "@/components/debug-meta-tags";
 import Script from "next/script";
 
 export default async function RootLayout({
@@ -164,6 +165,7 @@ export default async function RootLayout({
           ></iframe>
         </noscript>
         <MetadataHead />
+        <DebugMetaTags />
         <ThemeProvider>
           <Providers token={token} user={user}>
             {children}
