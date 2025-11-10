@@ -55,6 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_API_URL || "https://maxximum.by"),
     title,
     description,
     keywords,
@@ -81,6 +82,10 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_API_URL}/`, // Canonical для главной страницы
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import "../assets/scss/custom.scss";
 import "./globals.css";
 import "./prosemirror.css";
@@ -11,44 +10,6 @@ import { verifyToken } from "@/lib/auth";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import Script from "next/script";
-
-export const metadata: Metadata = {
-  title:
-    "Спортивно-образовательный центр «Максимум» в Витебске | Тренировки, секции, обучение",
-  description:
-    "Спортивно-образовательный центр «Максимум» в Витебске предлагает профессиональные тренировки, секции для детей, образовательные программы. Запишитесь онлайн на занятия!",
-  keywords:
-    "спортивный центр Витебск, детские секции, тренировки для детей, образовательные программы, спорт в Витебске, Максимум Витебск",
-  openGraph: {
-    title: "Спортивно-образовательный центр «Максимум» | Витебск",
-    description:
-      "Профессиональные тренировки и образовательные программы в Витебске. Присоединяйтесь к нам!",
-    type: "website",
-    url: `${process.env.NEXT_PUBLIC_API_URL}`,
-    images: [
-      {
-        url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/og.jpg`,
-        width: 800,
-        height: 600,
-        alt: "Спортивно-образовательный центр «Максимум» в Витебске",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Спортивно-образовательный центр «Максимум» | Витебск",
-    description:
-      "Профессиональные тренировки и образовательные программы в Витебске. Присоединяйтесь к нам!",
-    images: [
-      {
-        url: `${process.env.NEXT_PUBLIC_API_URL}/images/og/og.jpg`,
-        width: 800,
-        height: 600,
-        alt: "Спортивно-образовательный центр «Максимум» в Витебске",
-      },
-    ],
-  },
-};
 
 export default async function RootLayout({
   children,
