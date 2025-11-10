@@ -9,6 +9,7 @@ import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { MetadataHead } from "@/components/metadata-head";
 import Script from "next/script";
 
 export default async function RootLayout({
@@ -162,40 +163,13 @@ export default async function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           ></iframe>
         </noscript>
+        <MetadataHead />
         <ThemeProvider>
           <Providers token={token} user={user}>
             {children}
           </Providers>
         </ThemeProvider>
         <Toaster />
-        <Script
-          id="move-meta-to-head"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const body = document.body;
-                if (!body) return;
-                
-                // Находим все мета-теги и title в body
-                const metaTags = body.querySelectorAll('meta[property], meta[name], title');
-                const head = document.head;
-                
-                metaTags.forEach(tag => {
-                  // Проверяем, есть ли уже такой тег в head
-                  const attr = tag.getAttribute('property') || tag.getAttribute('name');
-                  if (attr) {
-                    const existing = head.querySelector(\`[property="\${attr}"], [name="\${attr}"]\`);
-                    // Если в head уже есть такой тег, удаляем из body
-                    if (existing) {
-                      tag.remove();
-                    }
-                  }
-                });
-              })();
-            `,
-          }}
-        />
       </body>
     </html>
   );
