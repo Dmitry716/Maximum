@@ -90,6 +90,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+export const revalidate = 600; // Revalidate every 10 minutes
+
 export default function Page() {
   // JSON-LD данные
   const organizationSchema = {
