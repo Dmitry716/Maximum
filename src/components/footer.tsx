@@ -128,7 +128,7 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          <span className='absolute text-[12px] md:text-[16px] text-center text-gray-400 text-nowrap left-1/2 transform -translate-x-1/2 bottom-[10px]'>Copyright ©2025 Все права защищены <br/>Разработка сайта <Link className='font-bold text-[#5828ba] hover:underline' href={'https://apsod.com/'}>Apsod</Link></span>
+          <span className='absolute text-[12px] md:text-[16px] text-center text-gray-400 text-nowrap left-1/2 transform -translate-x-1/2 bottom-[10px]'>Copyright ©2025 Все права защищены <br/>Разработка сайта <Link className='font-bold text-[#5828ba] hover:underline' href={'https://apsod.com/'} target='_blank'>Apsod</Link></span>
         </div>
       </div>
 
