@@ -1,0 +1,3 @@
+maxximum.by {
+    reverse_proxy app:3001
+}
