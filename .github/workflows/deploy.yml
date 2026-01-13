@@ -20,6 +20,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_KEY }}
           script: |
+            ping -c 4 185.251.38.163
             cd /home/user/maximum-frontend
             git pull
             docker-compose down
