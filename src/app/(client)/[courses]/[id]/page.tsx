@@ -57,19 +57,24 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const courses = await getAllCoursesPublic({ limit: 1000, page: 1 });
+  try {
+    const courses = await getAllCoursesPublic({ limit: 1000, page: 1 });
 
-  return courses.items
-    .filter((course) => 
-      course.category && 
-      typeof course.category !== "string" && 
-      course.category.url && 
-      course.category.url !== "courses"
-    )
-    .map((course) => ({
-      id: course.url,
-      courses: (course.category as any)?.url,
-    }));
+    return courses.items
+      .filter((course) =>
+        course.category &&
+        typeof course.category !== "string" &&
+        course.category.url &&
+        course.category.url !== "courses"
+      )
+      .map((course) => ({
+        id: course.url,
+        courses: (course.category as any)?.url,
+      }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return []; // Возвращаем пустой массив в случае ошибки
+  }
 }
 
 export const revalidate = 600;
