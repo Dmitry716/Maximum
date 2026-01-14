@@ -29,14 +29,14 @@ export default function LoginForm() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginFormValues) => {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
 
       const response = await res.json()      
-      console.log(response)
+      console.log('???', response)
       if (!response.ok) throw new Error(response.message || "Login failed")
 
       return response
