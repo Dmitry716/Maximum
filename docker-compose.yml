@@ -6,7 +6,9 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
     ports:
       - '3001:3001'
-
+    extra_hosts:
+      - "maxximum.by:host-gateway"
+  
   proxy:
     image: caddy:latest
     restart: unless-stopped
