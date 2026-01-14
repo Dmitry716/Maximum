@@ -3,7 +3,7 @@ import axios from 'axios'
 import { toast } from 'sonner'
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL_AXIOS,
 })
 
 export function setAuthToken(token?: string) {
