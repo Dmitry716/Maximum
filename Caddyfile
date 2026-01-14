@@ -1,4 +1,12 @@
 maxximum.by {
+    @frontend_api {
+        path /api/login /api/logout
+    }
+
+    handle @frontend_api {
+        reverse_proxy frontend:3001
+    }
+
     handle /api/* {
         reverse_proxy backend:3000
     }
