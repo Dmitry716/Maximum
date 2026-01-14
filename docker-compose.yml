@@ -1,5 +1,5 @@
 services:
-  app:
+  frontend:
     build: .
     environment:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
@@ -24,3 +24,8 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+
+networks:
+  default:
+    external:
+      name: public_net
