@@ -1,7 +1,7 @@
 import { api } from "@/lib/auth";
-import { Blog, SeoSetting  as SeoSettingType, Categories, Category, Course, CourseQueryParams, CreateApplication, CreateGroup, CreateUserAndBindGroup, FileRes, Group, NewsItem, PaginatedCourses, UpdateApplication, UpdateBlog, UpdateCourse, User } from "@/types/type";
+import { Blog, Categories, Category, Course, CourseQueryParams, CreateApplication, CreateGroup, CreateUserAndBindGroup, FileRes, Group, NewsItem, PaginatedCourses, SeoSetting as SeoSettingType, UpdateApplication, UpdateBlog, UpdateCourse, User } from "@/types/type";
 []
-export const backendUrl = process.env.NEXT_PUBLIC_API_URL_AXIOS
+export const backendUrl = process.env.NEXT_PUBLIC_API_URL
 
 export async function login(values: any) {
   const res = await fetch(`${backendUrl}/api/auth/login`, {
