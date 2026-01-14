@@ -1,9 +1,9 @@
 maxximum.by {
     handle /api/* {
-        reverse_proxy localhost:3000
+        reverse_proxy host.docker.internal:3000
     }
 
     handle {
-        reverse_proxy localhost:3001
+        reverse_proxy app:3001
     }
 }
