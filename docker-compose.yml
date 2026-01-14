@@ -27,5 +27,5 @@ volumes:
 
 networks:
   default:
-    external:
-      name: public_net
+    name: public_net
+    external: true
