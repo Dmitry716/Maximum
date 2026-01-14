@@ -1,9 +1,9 @@
-import { jwtVerify } from 'jose'
 import axios from 'axios'
+import { jwtVerify } from 'jose'
 import { toast } from 'sonner'
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL_AXIOS,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 })
 
 export function setAuthToken(token?: string) {
