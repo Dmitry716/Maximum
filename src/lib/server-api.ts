@@ -1,5 +1,9 @@
 // Серверная версия API без axios для Edge Runtime
-export const backendUrl = process.env.API_URL;
+const isServer = typeof window === 'undefined';
+
+export const backendUrl = isServer 
+  ? process.env.API_URL 
+  : process.env.NEXT_PUBLIC_API_URL;
 
 export async function serverGet(endpoint: string, options?: { revalidate?: number | false }) {
   try {
