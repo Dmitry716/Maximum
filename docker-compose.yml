@@ -8,6 +8,7 @@ services:
       - '3001:3001'
     extra_hosts:
       - "host.docker.internal:host-gateway" # "maxximum.by:host-gateway"
+      - "maxximum.by:172.20.0.1"
   
   proxy:
     image: caddy:latest
