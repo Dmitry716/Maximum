@@ -15,6 +15,9 @@ export default function CoursesTwo() {
     placeholderData: (previousData) => previousData,
   })
 
+  console.log(courses,"AAAAAAAAAAAAAAAA");
+  
+
   return (
     <div className="grid lg:grid-cols-2 md:grid-cols-1  mt-6 gap-6">
       {courses && courses.items.slice(0, 8).map((item: any, index: number) => (

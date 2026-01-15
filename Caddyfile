@@ -7,6 +7,10 @@ maxximum.by {
         reverse_proxy frontend:3001
     }
 
+    handle /uploads/* {
+        reverse_proxy maximum-backend-backend-1:3000
+    }
+
     handle /api/* {
         reverse_proxy 172.20.0.1:3000
     }
