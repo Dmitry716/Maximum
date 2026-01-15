@@ -220,7 +220,7 @@ export default async function BlogsPage({ searchParams }: Props) {
                       return (
                         <li key={pageNum}>
                           <Link
-                            href={`/blogs?page=${pageNum}#blogs`}
+                            href={`/blog?page=${pageNum}#blogs`}
                             className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${
                               pageNum === currentPage
                                 ? "bg-violet-600 text-white"
@@ -235,7 +235,7 @@ export default async function BlogsPage({ searchParams }: Props) {
                     <li>
                       {currentPage < totalPages ? (
                         <Link
-                          href={`/blogs?page=${currentPage + 1}`}
+                          href={`/blog?page=${currentPage + 1}`}
                           className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white hover:text-white shadow-sm hover:bg-violet-600"
                         >
                           <FiChevronRight
