@@ -8,13 +8,12 @@ import { RegisterApp } from '../register-app'
 import { ClientOnlyRenderNovel } from '../client-only-render-novel'
 
 export default function CoursesDetailPage({ course, courses }: { course: Course, courses: Course[] }) {
-
   return (
     <>
       <section
         className="relative table w-full py-32 lg:py-44 bg-no-repeat bg-center bg-cover"
         style={{
-          backgroundImage: `url(${process.env.NEXT_PUBLIC_API_URL}/${course.images[0]?.url})`,
+          backgroundImage: `url("${process.env.NEXT_PUBLIC_API_URL}/${course.images[0]?.url}")`,
         }}
       >
         <div className="absolute inset-0 bg-black opacity-80"></div>
