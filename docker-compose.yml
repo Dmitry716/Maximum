@@ -7,7 +7,7 @@ services:
     ports:
       - '3001:3001'
     extra_hosts:
-      - "maxximum.by:host-gateway"
+      - "host.docker.internal:host-gateway" # "maxximum.by:host-gateway"
   
   proxy:
     image: caddy:latest
@@ -16,6 +16,8 @@ services:
       - "80:80"
       - "443:443"
       - "443:443/udp" # For HTTP/3 support
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
