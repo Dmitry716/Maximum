@@ -1,17 +1,13 @@
 services:
   frontend:
-    build:
-      context: .
-      args:
-        - NEXT_PUBLIC_API_URL=http://172.20.0.1:3000 
+    build: .
     environment:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      NEXT_PUBLIC_API_URL: https://maxximum.by/api
     ports:
       - '3001:3001'
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway" # "maxximum.by:host-gateway"
       - "maxximum.by:172.20.0.1"
   
   proxy:
