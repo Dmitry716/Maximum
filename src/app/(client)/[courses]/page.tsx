@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
     !ogImageUrl.startsWith("http://") &&
     !ogImageUrl.startsWith("https://")
   ) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}` || "/placeholder-image.png";
   }
 
   return {

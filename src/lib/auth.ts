@@ -3,7 +3,7 @@ import { jwtVerify } from 'jose'
 import { toast } from 'sonner'
 
 export const api = axios.create({
-  baseURL: "https://maxximum.by",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 })
 
 export function setAuthToken(token?: string) {

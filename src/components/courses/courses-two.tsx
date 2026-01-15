@@ -15,9 +15,6 @@ export default function CoursesTwo() {
     placeholderData: (previousData) => previousData,
   })
 
-  console.log(courses,"AAAAAAAAAAAAAAAA");
-  
-
   return (
     <div className="grid lg:grid-cols-2 md:grid-cols-1  mt-6 gap-6">
       {courses && courses.items.slice(0, 8).map((item: any, index: number) => (
@@ -25,7 +22,7 @@ export default function CoursesTwo() {
           <div className="p-3 pb-0 relative">
             <Link href={`${process.env.NEXT_PUBLIC_API_URL}/${item.category.url}/${item.url}`} className="relative overflow-hidden rounded-md">
               <Image
-                src={`${process.env.NEXT_PUBLIC_API_URL}/${item.images[0]?.url}`}
+                src={`${process.env.NEXT_PUBLIC_API_URL}/${item?.images[0]?.url}` || "/placeholder-image.png"}
                 width={0}
                 height={0}
                 sizes="100vw"
