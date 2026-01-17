@@ -2,26 +2,26 @@
 
 import type React from "react"
 
+import { Button } from "@/components/ui/button"
+import { useAuth } from "@/hooks/auth-context"
+import { cn } from "@/lib/utils"
+import { UserRole } from "@/types/enum"
+import axios from "axios"
+import {
+  BarChart3,
+  BookOpen,
+  FileText,
+  FolderKanban,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  MessageSquare,
+  Newspaper,
+  Users,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  LayoutDashboard,
-  BookOpen,
-  FolderKanban,
-  Newspaper,
-  MessageSquare,
-  BarChart3,
-  Users,
-  LogOut,
-  FileText,
-  Menu,
-} from "lucide-react"
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import axios from "axios"
-import { useAuth } from "@/hooks/auth-context"
-import { UserRole } from "@/types/enum"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
 
@@ -92,27 +92,26 @@ export function Sidebar({ className }: SidebarProps) {
     user.role === UserRole.SUPER_ADMIN
       ? baseRoutes
       : user.role === UserRole.ADMIN ? baseRoutes.filter(
-        (route) => 
-          route.href !== "/dashboard/messages" && 
-          route.href !== "/dashboard/users" && 
+        (route) =>
+          route.href !== "/dashboard/messages" &&
+          route.href !== "/dashboard/users" &&
           route.href !== "/dashboard/seo"
       )
-      : user.role === UserRole.TEACHER ? baseRoutes.filter(
-        (route) =>
-          route.href !== "/dashboard/users" &&
-          route.href !== "/dashboard/blog" &&
-          route.href !== "/dashboard/news" &&
-          route.href !== "/dashboard/categories"
-      )
-        : user.role === UserRole.EDITOR && baseRoutes.filter(
+        : user.role === UserRole.TEACHER ? baseRoutes.filter(
           (route) =>
-            route.href !== "/dashboard" &&
-            route.href !== "/dashboard/users" &&
-            route.href !== "/dashboard/courses" &&
-            route.href !== "/dashboard/categories" &&
             route.href !== "/dashboard/messages" &&
-            route.href !== "/dashboard/statistics"
+            route.href !== "/dashboard/users" &&
+            route.href !== "/dashboard/blog" &&
+            route.href !== "/dashboard/news" &&
+            route.href !== "/dashboard/categories" &&
+            route.href !== "/dashboard/seo"
         )
+          : user.role === UserRole.EDITOR && baseRoutes.filter(
+            (route) =>
+              route.href !== "/dashboard/users" &&
+              route.href !== "/dashboard/messages" &&
+              route.href !== "/dashboard/seo"
+          )
 
   function sendRequest() {
     axios.post("/api/logout", {}).then((res: any) => console.log(res))
