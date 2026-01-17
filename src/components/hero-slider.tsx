@@ -60,7 +60,7 @@ export default function HeroSlider() {
             <div className="container relative md:mt-16">
               <div className="grid grid-cols-1">
                 <div className="text-center">
-                  <span className="font-bold text-white lg:leading-normal leading-normal text-2xl lg:text-3xl mb-4">ВЫБЕРИТЕ ЛУЧШЕЕ ДЛЯ СВОЕГО РЕБЕНКА – ВЫБИРАЙТЕ «МАКСИМУМ»
+                  <span className="font-bold text-white lg:leading-normal leading-normal text-2xl lg:text-3xl mb-4">ВЫБИРАЯ ЛУЧШЕЕ ДЛЯ СВОЕГО РЕБЕНКА – ВЫБИРАЙТЕ «МАКСИМУМ»
                   </span>
                   <p className="text-white/70 text-lg max-w-xl mx-auto">
                     Открывайте новые горизонты вместе с нами!<br />
