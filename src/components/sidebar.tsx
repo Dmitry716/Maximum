@@ -89,8 +89,14 @@ export function Sidebar({ className }: SidebarProps) {
   ]
 
   const routes =
-    user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN
+    user.role === UserRole.SUPER_ADMIN
       ? baseRoutes
+      : user.role === UserRole.ADMIN ? baseRoutes.filter(
+        (route) => 
+          route.href !== "/dashboard/messages" && 
+          route.href !== "/dashboard/users" && 
+          route.href !== "/dashboard/seo"
+      )
       : user.role === UserRole.TEACHER ? baseRoutes.filter(
         (route) =>
           route.href !== "/dashboard/users" &&
