@@ -96,14 +96,11 @@ type PageProps = {
 
 export default async function CoursesPage({ searchParams }: PageProps) {
   const loadCoursesSearchParams = createLoader(coursesSearchParamsMap);
-  const coursesValue = await loadCoursesSearchParams(searchParams);
+  const coursesSearchParams = await loadCoursesSearchParams(searchParams);
 
   const ages = await getAllAges();
   const categories = await getCategories();
-  const allCourses = await getAllCoursesPublic(coursesValue);
-  const selectedCategory = categories
-    .filter((cat) => coursesValue.categories?.includes(cat.url))
-    .map((cat) => cat.name);
+  const allCourses = await getAllCoursesPublic(coursesSearchParams);
 
   // JSON-LD для страницы "все курсы"
   const collectionSchema = {
