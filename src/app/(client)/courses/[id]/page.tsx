@@ -78,7 +78,7 @@ export async function generateStaticParams() {
 
 export const revalidate = 600;
 
-export type paramsType = Promise<{ id: string; courses: string }>;
+export type paramsType = Promise<{ id: string }>;
 
 export default async function Page(props: { params: paramsType }) {
   const { id } = await props.params;
@@ -105,9 +105,7 @@ export default async function Page(props: { params: paramsType }) {
       sameAs: `${process.env.NEXT_PUBLIC_API_URL}`,
       logo: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
     },
-    url: `${process.env.NEXT_PUBLIC_API_URL}/${(await props.params).courses}/${
-      course.url
-    }`,
+    url: `${process.env.NEXT_PUBLIC_API_URL}/courses/${course.url}`,
     image: course.images?.[0]?.url
       ? `${process.env.NEXT_PUBLIC_API_URL}${course.images[0].url}`
       : undefined,

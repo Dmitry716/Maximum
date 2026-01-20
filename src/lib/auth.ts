@@ -1,24 +1,25 @@
-import axios from 'axios'
-import { jwtVerify } from 'jose'
-import { toast } from 'sonner'
+import axios from "axios";
+import { jwtVerify } from "jose";
+import { toast } from "sonner";
 
 export const api = axios.create({
-  baseURL: typeof window === 'undefined'
-    ? process.env.API_URL
-    : process.env.NEXT_PUBLIC_API_URL,
-})
+  baseURL:
+    typeof window === "undefined"
+      ? process.env.API_URL
+      : process.env.NEXT_PUBLIC_API_URL,
+});
 
 export function setAuthToken(token?: string) {
   if (token) {
-    api.defaults.headers.common.Authorization = `Bearer ${token}`
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
   } else {
-    delete api.defaults.headers.common.Authorization
+    delete api.defaults.headers.common.Authorization;
   }
 }
 
 api.interceptors.response.use(
-  response => response,
-  error => {
+  (response) => response,
+  (error) => {
     if (error.response?.status === 401) {
       console.log(error, "XATOLIK");
 
@@ -28,19 +29,18 @@ api.interceptors.response.use(
       toast.error(error.response.data.message);
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export async function verifyToken(token: string) {
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET!)
+    const secret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET!);
 
-    const { payload } = await jwtVerify(token, secret)
+    const { payload } = await jwtVerify(token, secret);
 
-    return payload
+    return payload;
   } catch (error) {
-    console.log("❌ JWT verify failed:", error)
-    return null
+    console.log("❌ JWT verify failed:", error);
+    return null;
   }
 }
-

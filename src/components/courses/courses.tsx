@@ -16,10 +16,10 @@ import CoursesOne from "./courses-one";
 import CoursesSidebar from "./courses-sidebar";
 
 export const coursesSearchParamsMap: ParserMap = {
-  categories: parseAsNativeArrayOf(parseAsString),
+  categories: parseAsNativeArrayOf(parseAsString).withDefault(["all"]),
   limit: parseAsInteger,
-  page: parseAsInteger,
   search: parseAsString,
+  page: parseAsInteger,
 };
 
 export default function Courses({
@@ -63,7 +63,7 @@ export default function Courses({
   });
 
   useEffect(() => {
-    const findCtg = categories?.find((item: any) => item.url == ctg)?.id;
+    const findCtg = categories?.find((item: any) => item.url == ctg)?.url;
     if (findCtg) {
       setSearchParams({ categories: [findCtg] });
     }

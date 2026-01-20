@@ -90,18 +90,20 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 600;
 
-const loadCoursesSearchParams = createLoader(coursesSearchParamsMap);
-
 type PageProps = {
   searchParams: Promise<SearchParams>;
 };
 
 export default async function CoursesPage({ searchParams }: PageProps) {
-  const coursesSearchParams = await loadCoursesSearchParams(searchParams);
+  const loadCoursesSearchParams = createLoader(coursesSearchParamsMap);
+  const coursesValue = await loadCoursesSearchParams(searchParams);
 
   const ages = await getAllAges();
   const categories = await getCategories();
-  const allCourses = await getAllCoursesPublic(coursesSearchParams);
+  const allCourses = await getAllCoursesPublic(coursesValue);
+  const selectedCategory = categories
+    .filter((cat) => coursesValue.categories?.includes(cat.url))
+    .map((cat) => cat.name);
 
   // JSON-LD для страницы "все курсы"
   const collectionSchema = {

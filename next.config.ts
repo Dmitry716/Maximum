@@ -9,9 +9,9 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: ["127.0.0.1", "maxximum.by"],
+    domains: ["localhost", "maxximum.by"],
   },
-  output: 'standalone'
+  output: "standalone",
 };
 
 export default nextConfig;
