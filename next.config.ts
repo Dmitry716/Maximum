@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: ["example.com", "127.0.0.1", "maxximum.by"],
+    domains: ["127.0.0.1", "maxximum.by"],
   },
   output: 'standalone'
 };

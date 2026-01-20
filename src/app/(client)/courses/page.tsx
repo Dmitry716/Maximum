@@ -1,16 +1,20 @@
-import React from "react";
-import Link from "next/link";
-import Navbar from "@/components/navbar/navbar";
+import {
+  getAllAges,
+  getAllCoursesPublic,
+  getCategories,
+  getSeoSettingsByPageName,
+} from "@/api/requests";
+import Courses, { coursesSearchParamsMap } from "@/components/courses/courses";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { FiChevronRight } from "react-icons/fi";
-import Courses from "@/components/courses/courses";
-import { getAllAges, getAllCoursesPublic, getCategories } from "@/api/requests";
-import { getSeoSettingsByPageName } from "@/api/requests";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
+import { createLoader, SearchParams } from "nuqs/server";
+import { FiChevronRight } from "react-icons/fi";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
@@ -19,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
   } catch (error) {
     console.error(
       "Error fetching SEO data for courses, using defaults:",
-      error
+      error,
     );
   }
 
@@ -86,10 +90,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const revalidate = 600;
 
-export default async function CoursesPage() {
+const loadCoursesSearchParams = createLoader(coursesSearchParamsMap);
+
+type PageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default async function CoursesPage({ searchParams }: PageProps) {
+  const coursesSearchParams = await loadCoursesSearchParams(searchParams);
+
   const ages = await getAllAges();
   const categories = await getCategories();
-  const allCourses = await getAllCoursesPublic({ limit: 1000, page: 1 });
+  const allCourses = await getAllCoursesPublic(coursesSearchParams);
 
   // JSON-LD для страницы "все курсы"
   const collectionSchema = {

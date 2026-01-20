@@ -1,22 +1,20 @@
-'use client'
-import React, { useEffect, useState } from 'react';
-import { FiSearch } from 'react-icons/fi';
+"use client";
 import { Categories, CourseQueryParams } from "@/types/type";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { FiSearch } from "react-icons/fi";
 
 export default function CoursesSidebar({
-  filters,
-  setFilters,
+  searchParams,
+  setSearchParams,
   categories = [],
 }: {
   ages: string[];
-  filters: CourseQueryParams;
-  setFilters: React.Dispatch<React.SetStateAction<CourseQueryParams>>;
+  searchParams: CourseQueryParams;
+  setSearchParams: (queryParams: CourseQueryParams) => void;
   categories?: Categories[];
 }) {
-  const [search, setSearch] = useState(filters.search ?? '');
-  const [selectedCategories, setSelectedCategories] = useState<number[]>(filters.categories ?? []);
-  const [level, setLevel] = useState(filters.level ?? '');
+  const { categories: selectedCategories, search, level } = searchParams;
   const [minSlider, setMinSlider] = useState(0);
   const [maxSlider, setMaxSlider] = useState(100);
   const router = useRouter();
@@ -26,9 +24,10 @@ export default function CoursesSidebar({
   const REAL_MAX = 1000000;
 
   const minPrice = Math.floor((minSlider / SLIDER_MAX) * REAL_MAX);
-  const maxPrice = maxSlider === SLIDER_MAX
-    ? REAL_MAX
-    : Math.floor((maxSlider / SLIDER_MAX) * REAL_MAX);
+  const maxPrice =
+    maxSlider === SLIDER_MAX
+      ? REAL_MAX
+      : Math.floor((maxSlider / SLIDER_MAX) * REAL_MAX);
 
   const handleMinSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = +e.target.value;
@@ -41,15 +40,13 @@ export default function CoursesSidebar({
   };
 
   const applyFilters = () => {
-    setFilters(prev => ({
-      ...prev,
-      page: 1,
+    setSearchParams({
       search,
       categories: selectedCategories,
       minPrice,
       maxPrice,
-      level
-    }));
+      level,
+    });
   };
 
   useEffect(() => {
@@ -58,28 +55,42 @@ export default function CoursesSidebar({
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [minPrice, maxPrice, search, selectedCategories, level])
-
-  useEffect(() => {
-    setSelectedCategories(filters.categories ?? [])
-  }, [filters.categories])
+  }, [minPrice, maxPrice, search, selectedCategories, level]);
 
   const toggleCategory = (id: number) => {
-    setSelectedCategories(prev =>
-      prev.includes(id) ? prev.filter(catId => catId !== id) : [...prev, id]
-    );
+    const idStr = String(id);
+    let oldSelectedCategories: string[] = selectedCategories || [];
+    const includesId = oldSelectedCategories.includes(idStr);
+    let newSelectedCategories: string[] = selectedCategories || [];
+    if (includesId) {
+      newSelectedCategories = newSelectedCategories?.filter(
+        (catId) => catId !== idStr,
+      );
+    } else {
+      newSelectedCategories = [...newSelectedCategories, idStr];
+    }
+    setSearchParams({ categories: newSelectedCategories, page: 1 });
   };
 
   return (
     <div className="p-6 bg-white dark:bg-slate-900 rounded-md shadow shadow-slate-100 dark:shadow-slate-800 sticky top-20">
-
       {/* Search */}
       <form>
         <div>
-          <label htmlFor="searchname" className="font-semibold text-xl">Поиск направления</label>
+          <label htmlFor="searchname" className="font-semibold text-xl">
+            Поиск направления
+          </label>
           <div className="relative mt-2">
             <FiSearch className="absolute top-[10px] start-3 size-5" />
-            <input onChange={(e) => setSearch(e.target.value)} name="search" id="searchname" type="text" className="w-full py-2 px-3 border border-slate-100 dark:border-slate-800 focus:border-violet-600/30 dark:focus:border-violet-600/30 bg-transparent focus:outline-none rounded-md h-10 ps-10" placeholder="Поиск" />
+            <input
+              onChange={(e) => setSearchParams({ search: e.target.value })}
+              value={search}
+              name="search"
+              id="searchname"
+              type="text"
+              className="w-full py-2 px-3 border border-slate-100 dark:border-slate-800 focus:border-violet-600/30 dark:focus:border-violet-600/30 bg-transparent focus:outline-none rounded-md h-10 ps-10"
+              placeholder="Поиск"
+            />
           </div>
         </div>
       </form>
@@ -93,40 +104,48 @@ export default function CoursesSidebar({
               <input
                 className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
                 type="checkbox"
-                checked={selectedCategories.length === 0}
+                checked={selectedCategories?.length === 0}
                 onChange={() => {
-                  router.push('/courses')
-                  setSelectedCategories([])
+                  router.push("/courses");
+                  setSearchParams({ categories: [] });
                 }}
                 id="AllCategories"
               />
-              <label className="form-checkbox-label text-lg text-slate-400" htmlFor="AllCategories">
+              <label
+                className="form-checkbox-label text-lg text-slate-400"
+                htmlFor="AllCategories"
+              >
                 Все категории
               </label>
             </div>
           </div>
+          {categories &&
+            categories.map((category) => (
+              <div key={category.id} className="flex justify-between mt-2">
+                <div className="inline-flex items-center mb-0">
+                  <input
+                    checked={searchParams.categories?.includes(
+                      String(category.id),
+                    )}
+                    className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
+                    type="checkbox"
+                    onChange={() => toggleCategory(Number(category.id))}
+                    value={category.id}
+                    id={`category-${category.id}`}
+                  />
+                  <label
+                    className="form-checkbox-label text-lg text-slate-400"
+                    htmlFor={`category-${category.id}`}
+                  >
+                    {category.name}
+                  </label>
+                </div>
 
-          {categories && categories.map((category) => (
-            <div key={category.id} className="flex justify-between mt-2">
-              <div className="inline-flex items-center mb-0">
-                <input
-                  checked={selectedCategories.includes(Number(category.id))}
-                  className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
-                  type="checkbox"
-                  onChange={() => toggleCategory(Number(category.id))}
-                  value={category.id}
-                  id={`category-${category.id}`}
-                />
-                <label className="form-checkbox-label text-lg text-slate-400" htmlFor={`category-${category.id}`}>
-                  {category.name}
-                </label>
+                <span className="  text-violet-600 text-md  font-semibold rounded-full h-5">
+                  {category.coursesCount}
+                </span>
               </div>
-
-              <span className="  text-violet-600 text-md  font-semibold rounded-full h-5">
-                {category.coursesCount}
-              </span>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
 
@@ -213,7 +232,6 @@ export default function CoursesSidebar({
 
         </div>
       </div> */}
-      
     </div>
-  )
+  );
 }

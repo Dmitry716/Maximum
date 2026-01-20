@@ -1,19 +1,37 @@
 import { api } from "@/lib/auth";
-import { Blog, Categories, Category, Course, CourseQueryParams, CreateApplication, CreateGroup, CreateUserAndBindGroup, FileRes, Group, NewsItem, PaginatedCourses, SeoSetting as SeoSettingType, UpdateApplication, UpdateBlog, UpdateCourse, User } from "@/types/type";
-[]
+import {
+  Blog,
+  Categories,
+  Category,
+  Course,
+  CourseQueryParams,
+  CreateApplication,
+  CreateGroup,
+  CreateUserAndBindGroup,
+  FileRes,
+  Group,
+  NewsItem,
+  PaginatedCourses,
+  SeoSetting as SeoSettingType,
+  UpdateApplication,
+  UpdateBlog,
+  UpdateCourse,
+  User,
+} from "@/types/type";
+[];
 
-const isServer = typeof window === 'undefined';
+const isServer = typeof window === "undefined";
 
-export const backendUrl = isServer 
-  ? process.env.API_URL 
-  : process.env.NEXT_PUBLIC_API_URL
+export const backendUrl = isServer
+  ? process.env.API_URL
+  : process.env.NEXT_PUBLIC_API_URL;
 
 export async function login(values: any) {
   const res = await fetch(`${backendUrl}/api/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "accept": "application/json",
+      accept: "application/json",
     },
     body: JSON.stringify(values),
   } as any);
@@ -26,42 +44,42 @@ export async function getStats(userId?: string) {
     params.userId = userId;
   }
 
-  const { data } = await api.get(`/api/statistics/dashboard`, { params })
-  return data
+  const { data } = await api.get(`/api/statistics/dashboard`, { params });
+  return data;
 }
 
 export async function getAdminNotification() {
-  const { data } = await api.get('/api/notif/admin')
-  return data
+  const { data } = await api.get("/api/notif/admin");
+  return data;
 }
 
 export async function getNotification(id: string) {
-  const { data } = await api.get('/api/notif/' + id)
-  return data
+  const { data } = await api.get("/api/notif/" + id);
+  return data;
 }
 
 export async function readAllNotification(ids: string[], id: string) {
-  const { data } = await api.patch(`/api/notif/read-all?id=${id}`, { ids })
-  return data as any
+  const { data } = await api.patch(`/api/notif/read-all?id=${id}`, { ids });
+  return data as any;
 }
 
 export async function readAllAdminNotification(ids: string[]) {
-  const { data } = await api.patch('/api/notif/admin/read-all', { ids })
-  return data as any
+  const { data } = await api.patch("/api/notif/admin/read-all", { ids });
+  return data as any;
 }
 
 export async function getCategories() {
-  const { data } = await api.get('/api/categories')
-  return data as Categories[]
+  const { data } = await api.get("/api/categories");
+  return data as Categories[];
 }
 
 export async function getCategoriesAdmin() {
-  const { data } = await api.get('/api/categories/admin')
-  return data as Categories[]
+  const { data } = await api.get("/api/categories/admin");
+  return data as Categories[];
 }
 
 export async function getUsers(role?: string) {
-  const query = role ? `?role=${role}` : '';
+  const query = role ? `?role=${role}` : "";
   const { data } = await api.get(`/api/users${query}`);
   return data as User[];
 }
@@ -82,7 +100,9 @@ export async function updateUser(user: any) {
       occupation: user.occupation,
       education: user.education,
       website: user.website,
-    }).filter(([_, value]) => value !== null && value !== undefined && value !== "")
+    }).filter(
+      ([_, value]) => value !== null && value !== undefined && value !== "",
+    ),
   );
 
   const { data } = await api.patch(`/api/users/${user.id}`, filteredUserData);
@@ -105,9 +125,11 @@ export async function createUser(user: any) {
       occupation: user.occupation,
       education: user.education,
       website: user.website,
-    }).filter(([_, value]) => value !== null && value !== undefined && value !== "")
+    }).filter(
+      ([_, value]) => value !== null && value !== undefined && value !== "",
+    ),
   );
-  const { data } = await api.post('/api/users', filteredUserData);
+  const { data } = await api.post("/api/users", filteredUserData);
   return data as User;
 }
 
@@ -116,15 +138,21 @@ export async function deleteUser(userId: string) {
   return data as User;
 }
 
-export async function createCategory(name: string, status?: boolean, url?: string) {
-  const { data } = await api.post('/api/categories', { name, status, url });
+export async function createCategory(
+  name: string,
+  status?: boolean,
+  url?: string,
+) {
+  const { data } = await api.post("/api/categories", { name, status, url });
   return data as Category;
 }
 
 export async function updateCategory(category: Category) {
-  const { data } = await api.patch(`/api/categories/${category.id}`,
-    { name: category.name, status: category.status, url: category.url }
-  );
+  const { data } = await api.patch(`/api/categories/${category.id}`, {
+    name: category.name,
+    status: category.status,
+    url: category.url,
+  });
   return data as Category;
 }
 
@@ -134,17 +162,17 @@ export async function deleteCategory(categoryId: string) {
 }
 
 export async function getAllCourses(all: string): Promise<Course[]> {
-  const { data } = await api.get('/api/courses/all')
+  const { data } = await api.get("/api/courses/all");
   return data;
 }
 
 export async function getAllCoursesPublic(
-  filters: CourseQueryParams = {}
+  filters: CourseQueryParams = {},
 ): Promise<PaginatedCourses> {
   const params: Record<string, any> = {};
-
+  console.trace();
   if (filters.categories && filters.categories.length > 0) {
-    params.categories = filters.categories.join(',');
+    params.categories = filters.categories.join(",");
   }
 
   if (filters.minPrice !== undefined) {
@@ -166,7 +194,7 @@ export async function getAllCoursesPublic(
   params.limit = filters.limit ?? 10;
   params.page = filters.page ?? 1;
 
-  const { data } = await api.get<PaginatedCourses>('/api/courses', {
+  const { data } = await api.get<PaginatedCourses>("/api/courses", {
     params,
   });
 
@@ -185,17 +213,17 @@ export async function getBlogByUrl(url: string) {
 
 export async function getNewsByUrl(url: string) {
   try {
-    console.log('Fetching news by URL:', url);
-    console.log('API base URL:', backendUrl);
-    console.log('Full URL:', `${backendUrl}/api/news/url/${url}`);
-    
+    console.log("Fetching news by URL:", url);
+    console.log("API base URL:", backendUrl);
+    console.log("Full URL:", `${backendUrl}/api/news/url/${url}`);
+
     const { data } = await api.get(`/api/news/url/${url}`);
-    console.log('Successfully fetched news data');
+    console.log("Successfully fetched news data");
     return data as NewsItem;
   } catch (error: any) {
-    console.error('Error in getNewsByUrl:', error);
-    console.error('Error response status:', error.response?.status);
-    console.error('Error response data:', error.response?.data);
+    console.error("Error in getNewsByUrl:", error);
+    console.error("Error response status:", error.response?.status);
+    console.error("Error response data:", error.response?.data);
     throw error;
   }
 }
@@ -211,17 +239,23 @@ export async function deleteCourse(courseId: string) {
 }
 
 export async function createCourse(course: UpdateCourse) {
-  const { data } = await api.post('/api/courses', course);
+  const { data } = await api.post("/api/courses", course);
   return data as Course;
 }
 
-export async function updateCourse({ id, data: course }: { id: string, data: UpdateCourse }) {  
+export async function updateCourse({
+  id,
+  data: course,
+}: {
+  id: string;
+  data: UpdateCourse;
+}) {
   const { data } = await api.patch(`/api/courses/${id}`, course);
   return data as Course;
 }
 
 export async function uploadFile(file: FormData) {
-  const { data } = await api.post('/api/files/upload', file);
+  const { data } = await api.post("/api/files/upload", file);
   return data as FileRes;
 }
 
@@ -230,7 +264,7 @@ export async function getNews(
   limit: number,
   status: string,
   categoryName?: string,
-  excludeBlogId?: number
+  excludeBlogId?: number,
 ) {
   const params = new URLSearchParams({
     page: String(currentPage),
@@ -248,8 +282,8 @@ export async function getNews(
 
   const { data } = await api.get(`/api/news?${params.toString()}`);
   return data as {
-    items: NewsItem[],
-    total: number
+    items: NewsItem[];
+    total: number;
   };
 }
 
@@ -264,7 +298,7 @@ export async function updateNews(id: string, data: any) {
 }
 
 export async function createNews(data: any) {
-  const { data: res } = await api.post('/api/news', data);
+  const { data: res } = await api.post("/api/news", data);
   return res as any;
 }
 
@@ -278,7 +312,7 @@ export async function getBlogs(
   limit: number,
   status: string,
   categoryName?: string,
-  excludeBlogId?: number
+  excludeBlogId?: number,
 ) {
   const params = new URLSearchParams({
     page: String(currentPage),
@@ -296,8 +330,8 @@ export async function getBlogs(
 
   const { data } = await api.get(`/api/blog?${params.toString()}`);
   return data as {
-    items: Blog[],
-    total: number
+    items: Blog[];
+    total: number;
   };
 }
 
@@ -306,18 +340,31 @@ export async function getBlogById(id: string) {
   return data as Blog;
 }
 
-export async function getBlogsByTeacher(id: string, currentPage: number, limit: number, status: string) {
-  const { data } = await api.get(`/api/blog/teacher/${id}?page=${currentPage}&limit=${limit}&status=${status}`);
+export async function getBlogsByTeacher(
+  id: string,
+  currentPage: number,
+  limit: number,
+  status: string,
+) {
+  const { data } = await api.get(
+    `/api/blog/teacher/${id}?page=${currentPage}&limit=${limit}&status=${status}`,
+  );
   return data as Course[];
 }
 
-export async function updateBlog({ id, data: blog }: { id: string, data: UpdateBlog }) {
+export async function updateBlog({
+  id,
+  data: blog,
+}: {
+  id: string;
+  data: UpdateBlog;
+}) {
   const { data } = await api.patch(`/api/blog/${id}`, blog);
   return data as Blog;
 }
 
 export async function createBlog(blog: UpdateBlog) {
-  const { data } = await api.post('/api/blog', blog);
+  const { data } = await api.post("/api/blog", blog);
   return data as Blog;
 }
 
@@ -327,23 +374,23 @@ export async function deleteBlog(blogId: string) {
 }
 
 export async function createGroup(group: CreateGroup) {
-  const { data } = await api.post('/api/groups', {
+  const { data } = await api.post("/api/groups", {
     courseId: group.courseId,
     groupNumber: group.groupNumber,
     ageRange: group.ageRange,
     maxStudents: group.maxStudents,
-    schedule: group.schedule
+    schedule: group.schedule,
   });
   return data as Group;
 }
 
-export async function updateGroup(group:Group) {
+export async function updateGroup(group: Group) {
   const { data } = await api.patch(`/api/groups/${group.id}`, {
     courseId: group.courseId,
     groupNumber: group.groupNumber,
     ageRange: group.ageRange,
     maxStudents: group.maxStudents,
-    schedule: group.schedule
+    schedule: group.schedule,
   });
   return data as Group;
 }
@@ -354,22 +401,26 @@ export async function deleteGroup(groupId: string) {
 }
 
 export async function createApplication(data: CreateApplication) {
-  const { data: res } = await api.post('/api/applications', data);
+  const { data: res } = await api.post("/api/applications", data);
   return res as any;
 }
 
 export async function createUserAndBindGroup(data: CreateUserAndBindGroup) {
-  const { data: res } = await api.post('/api/applications/user-course-group', data);
+  const { data: res } = await api.post(
+    "/api/applications/user-course-group",
+    data,
+  );
   return res as any;
 }
 
 export async function getApplications(currentPage: number, limit: number) {
-  const { data } = await api.get(`/api/applications?page=${currentPage}&limit=${limit}`);
+  const { data } = await api.get(
+    `/api/applications?page=${currentPage}&limit=${limit}`,
+  );
   return data as any;
 }
 
 export async function updateApplication({ data }: { data: UpdateApplication }) {
-  
   const { data: res } = await api.patch(`/api/applications/${data.id}`, {
     childName: data.childName,
     parentPhone: data.parentPhone,
@@ -380,13 +431,13 @@ export async function updateApplication({ data }: { data: UpdateApplication }) {
     courseId: data.courseId,
     parentEmail: data.parentEmail,
     message: data.message,
-    responseMessage: data.responseMessage
+    responseMessage: data.responseMessage,
   });
   return res as any;
 }
 
 export async function getAllAges() {
-  const { data } = await api.get('/api/groups/age-ranges');
+  const { data } = await api.get("/api/groups/age-ranges");
   return data as string[];
 }
 
@@ -405,23 +456,30 @@ export async function updateUserProfile(user: User, id: string) {
   return data as User;
 }
 
-export async function updatePassword(id: string, password: string, oldPassword: string) {
-  const { data } = await api.patch(`/api/users/${id}`, { password, oldPassword });
+export async function updatePassword(
+  id: string,
+  password: string,
+  oldPassword: string,
+) {
+  const { data } = await api.patch(`/api/users/${id}`, {
+    password,
+    oldPassword,
+  });
   return data as User;
 }
 
 export async function updateUserSatus(id: string, status: string) {
   const { data } = await api.patch(`/api/users/${id}`, { status });
   return data as User;
-} 
+}
 
 export async function getAllNewsPublic(
-  filters: { limit?: number; page?: number; status?: string } = {}
+  filters: { limit?: number; page?: number; status?: string } = {},
 ): Promise<{ items: NewsItem[]; total: number }> {
   const params = new URLSearchParams({
     limit: String(filters.limit ?? 1000),
     page: String(filters.page ?? 1),
-    status: filters.status ?? 'PUBLISHED'
+    status: filters.status ?? "PUBLISHED",
   });
 
   const { data } = await api.get(`/api/news?${params.toString()}`);
@@ -429,12 +487,12 @@ export async function getAllNewsPublic(
 }
 
 export async function getAllBlogsPublic(
-  filters: { limit?: number; page?: number; status?: string } = {}
+  filters: { limit?: number; page?: number; status?: string } = {},
 ): Promise<{ items: Blog[]; total: number }> {
   const params = new URLSearchParams({
     limit: String(filters.limit ?? 1000),
     page: String(filters.page ?? 1),
-    status: filters.status ?? 'PUBLISHED'
+    status: filters.status ?? "PUBLISHED",
   });
 
   const { data } = await api.get(`/api/blog?${params.toString()}`);
@@ -456,10 +514,14 @@ export async function getAllBlogsPublic(
 //   return response.data;
 // }
 
-export async function getSeoSettingsByPageName(pageName: string): Promise<SeoSettingType | null> {
+export async function getSeoSettingsByPageName(
+  pageName: string,
+): Promise<SeoSettingType | null> {
   try {
     // !!! ВАЖНО: Изменяем путь на НОВЫЙ эндпоинт !!!
-    const response = await api.get<SeoSettingType | null>(`/api/seo/${pageName}`);
+    const response = await api.get<SeoSettingType | null>(
+      `/api/seo/${pageName}`,
+    );
     // API возвращает null, если запись не найдена
     return response.data;
   } catch (error: any) {
@@ -483,8 +545,14 @@ export async function getSeoSettingsByPageName(pageName: string): Promise<SeoSet
  * @param seoData Частичные SEO-данные для обновления/создания.
  * @returns Обновленный или созданный объект SeoSetting.
  */
-export async function updateSeoSettings(pageName: string, seoData: Partial<SeoSettingType>): Promise<SeoSettingType> {
+export async function updateSeoSettings(
+  pageName: string,
+  seoData: Partial<SeoSettingType>,
+): Promise<SeoSettingType> {
   // !!! ВАЖНО: Изменяем путь на НОВЫЙ эндпоинт !!!
-  const response = await api.put<SeoSettingType>(`/api/seo/${pageName}`, seoData);
+  const response = await api.put<SeoSettingType>(
+    `/api/seo/${pageName}`,
+    seoData,
+  );
   return response.data;
 }

@@ -118,7 +118,7 @@ export interface PaginatedCourses {
 }
 
 export interface CourseQueryParams {
-  categories?: number[];
+  categories?: string[];
   minPrice?: number;
   maxPrice?: number;
   level?: string;

@@ -1,16 +1,17 @@
+import "katex/dist/katex.min.css";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import "vanilla-cookieconsent/dist/cookieconsent.css";
 import "../assets/scss/custom.scss";
 import "./globals.css";
 import "./prosemirror.css";
-import "katex/dist/katex.min.css";
-import "vanilla-cookieconsent/dist/cookieconsent.css";
 
-import { Providers } from "@/components/providers";
-import { cookies } from "next/headers";
-import { verifyToken } from "@/lib/auth";
-import { Toaster } from "sonner";
-import { ThemeProvider } from "@/components/theme-provider";
 import { MetadataHead } from "@/components/metadata-head";
+import { Providers } from "@/components/providers";
+import { ThemeProvider } from "@/components/theme-provider";
+import { verifyToken } from "@/lib/auth";
+import { cookies } from "next/headers";
 import Script from "next/script";
+import { Toaster } from "sonner";
 
 export default async function RootLayout({
   children,
@@ -166,7 +167,7 @@ export default async function RootLayout({
         <MetadataHead />
         <ThemeProvider>
           <Providers token={token} user={user}>
-            {children}
+            <NuqsAdapter>{children}</NuqsAdapter>
           </Providers>
         </ThemeProvider>
         <Toaster />

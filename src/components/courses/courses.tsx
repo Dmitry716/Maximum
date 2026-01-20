@@ -1,33 +1,61 @@
-"use client"
+"use client";
 
-import CoursesOne from "./courses-one"
-import CoursesSidebar from "./courses-sidebar"
 import { getAllCoursesPublic } from "@/api/requests";
+import { Course } from "@/types/type";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Course, CourseQueryParams } from "@/types/type";
+import {
+  parseAsArrayOf,
+  parseAsInteger,
+  parseAsString,
+  ParserMap,
+  useQueryStates,
+} from "nuqs";
+import { useEffect } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useIsMobile } from "../ui/use-mobile";
+import CoursesOne from "./courses-one";
+import CoursesSidebar from "./courses-sidebar";
 
-export default function Courses({ ctg, categories, ages }: { ctg: string, categories: any, ages: any }) {
-  const [filters, setFilters] = useState<CourseQueryParams>({
-    page: 1,
-    limit: 12
-  });
+export const coursesSearchParamsMap: ParserMap = {
+  categories: parseAsArrayOf(parseAsString),
+  level: parseAsString,
+  limit: parseAsInteger,
+  maxPrice: parseAsInteger,
+  minPrice: parseAsInteger,
+  page: parseAsInteger,
+  search: parseAsString,
+};
 
+export default function Courses({
+  ctg,
+  categories,
+  ages,
+}: {
+  ctg: string;
+  categories: any;
+  ages: any;
+}) {
   const isMobile = useIsMobile();
-
+  const [searchParams, setSearchParams] = useQueryStates(
+    coursesSearchParamsMap,
+    {
+      scroll: true,
+    },
+  );
+  console.log(searchParams.page);
   const { data: courses, isLoading } = useQuery({
-    queryKey: ['courses', filters],
-    queryFn: () => getAllCoursesPublic(filters),
+    queryKey: ["courses", searchParams],
+    queryFn: () => getAllCoursesPublic(searchParams),
     staleTime: 1000 * 60 * 5,
     retry: 3,
     placeholderData: (previousData) => previousData,
   });
 
   useEffect(() => {
-    const findCtg = categories?.find((item: any) => item.url == ctg)?.id
-    if (findCtg) setFilters((prev: any) => ({ ...prev, categories: [findCtg] }))
+    const findCtg = categories?.find((item: any) => item.url == ctg)?.id;
+    if (findCtg) {
+      setSearchParams({ categories: [findCtg] });
+    }
   }, [categories]);
 
   if (isLoading || !courses) return <div>Loading...</div>;
@@ -39,9 +67,7 @@ export default function Courses({ ctg, categories, ages }: { ctg: string, catego
       <div id="courses-list" className="lg:col-span-8 md:order-1 order-2">
         <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
           {courses.items.map((item: Course, index: number) => {
-            return (
-              <CoursesOne item={item} key={index} />
-            )
+            return <CoursesOne item={item} key={index} />;
           })}
         </div>
 
@@ -50,17 +76,15 @@ export default function Courses({ ctg, categories, ages }: { ctg: string, catego
             <div className="md:col-span-12 text-center">
               <nav>
                 <ul className="inline-flex items-center -space-x-px">
-
                   {/* Prev */}
                   <li>
                     <button
                       onClick={() => {
-                        setFilters((prev: any) => ({ ...prev, page: Math.max(prev.page - 1, 1) }))
-                        setTimeout(() => {
-                          (document.documentElement || document.body).scrollTo({ top: isMobile ? 270 : 100, behavior: 'smooth' });
-                        }, 50);
+                        setSearchParams({
+                          page: Math.max(+(searchParams.page ?? "1") - 1, 1),
+                        });
                       }}
-                      disabled={filters.page === 1}
+                      disabled={searchParams.page === 1}
                       className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white dark:bg-slate-900 hover:text-white shadow-sm shadow-slate-100 dark:shadow-slate-800 hover:border-violet-600 dark:hover:border-violet-600 hover:bg-violet-600 dark:hover:bg-violet-600 disabled:opacity-30"
                     >
                       <FiChevronLeft
@@ -71,35 +95,39 @@ export default function Courses({ ctg, categories, ages }: { ctg: string, catego
                   </li>
 
                   {/* Page numbers */}
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <li key={p}>
-                      <button
-                        onClick={() => {
-                          setFilters((prev) => ({ ...prev, page: p }))
-                          setTimeout(() => {
-                            (document.documentElement || document.body).scrollTo({ top: isMobile ? 270 : 100, behavior: 'smooth' });
-                          }, 50);
-                        }}
-                        className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${filters.page === p
-                          ? 'bg-violet-600 text-white'
-                          : 'text-slate-400 bg-white dark:bg-slate-900 hover:text-white hover:bg-violet-600'
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (p) => (
+                      <li key={p}>
+                        <button
+                          onClick={() => {
+                            setSearchParams({
+                              page: p,
+                            });
+                          }}
+                          className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${
+                            searchParams.page === p
+                              ? "bg-violet-600 text-white"
+                              : "text-slate-400 bg-white dark:bg-slate-900 hover:text-white hover:bg-violet-600"
                           }`}
-                      >
-                        {p}
-                      </button>
-                    </li>
-                  ))}
+                        >
+                          {p}
+                        </button>
+                      </li>
+                    ),
+                  )}
 
                   {/* Next */}
                   <li>
                     <button
                       onClick={() => {
-                        setFilters((prev: any) => ({ ...prev, page: Math.min(prev.page + 1, totalPages) }))
-                        setTimeout(() => {
-                          (document.documentElement || document.body).scrollTo({ top: isMobile ? 270 : 100, behavior: 'smooth' });
-                        }, 50);
+                        setSearchParams({
+                          page: Math.min(
+                            +(searchParams.page ?? 0) + 1,
+                            totalPages,
+                          ),
+                        });
                       }}
-                      disabled={filters.page === totalPages}
+                      disabled={searchParams.page === totalPages}
                       className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white dark:bg-slate-900 hover:text-white shadow-sm shadow-slate-100 dark:shadow-slate-800 hover:border-violet-600 dark:hover:border-violet-600 hover:bg-violet-600 dark:hover:bg-violet-600 disabled:opacity-30"
                     >
                       <FiChevronRight
@@ -108,19 +136,23 @@ export default function Courses({ ctg, categories, ages }: { ctg: string, catego
                       />
                     </button>
                   </li>
-
                 </ul>
               </nav>
             </div>
           </div>
         )}
-
       </div>
 
       <div className="lg:col-span-4 md:order-2 order-1">
-        {categories && ages && <CoursesSidebar ages={ages as string[]} filters={filters} setFilters={setFilters} categories={categories} />}
-
+        {categories && ages && (
+          <CoursesSidebar
+            ages={ages as string[]}
+            searchParams={searchParams}
+            setSearchParams={setSearchParams}
+            categories={categories}
+          />
+        )}
       </div>
     </div>
-  )
+  );
 }
