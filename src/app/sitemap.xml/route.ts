@@ -1,21 +1,23 @@
-import { getAllCoursesPublic } from "@/api/requests";
-import { getAllBlogsPublic } from "@/api/requests";
-import { getAllNewsPublic } from "@/api/requests";
+import {
+  getAllBlogsPublic,
+  getAllCoursesPublic,
+  getAllNewsPublic,
+} from "@/api/requests";
 import { getServerSideSitemap, ISitemapField } from "next-sitemap";
 
 // Ensure sitemap is always fresh, not cached
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
   const Url = process.env.NEXT_PUBLIC_API_URL!;
-  
+
   // Получите все курсы
   const allCourses = await getAllCoursesPublic({ limit: 1000, page: 1 });
-  
+
   // Получите все блоги
   const allBlogs = await getAllBlogsPublic({ limit: 1000, page: 1 });
-  
+
   // Получите все новости
   const allNews = await getAllNewsPublic({ limit: 1000, page: 1 });
 
@@ -24,57 +26,62 @@ export async function GET() {
     ({ createdAt, category, url }) => {
       const lastmod = new Date(createdAt).toISOString();
 
-      // Генерируем URL только для курсов с категорией (не "courses")
-      if (category && typeof category === 'object' && category.url && category.url !== "courses") {
-        const loc = `${Url}/${category.url}/${url ?? ''}`;
+      // Генерируем URL только для курсов (не "courses")
+      if (
+        category &&
+        typeof category === "object" &&
+        category.url &&
+        category.url !== "courses"
+      ) {
+        const loc = `${Url}/courses/${url ?? ""}`;
         return [
           {
             loc,
             lastmod,
             changefreq: "monthly",
-            priority: "0.9" as any, 
+            priority: "0.9" as any,
           },
         ];
       }
-      
+
       // Для курсов без категории или с категорией "courses" - не добавляем в sitemap
       return [];
     },
   );
 
   // Генерация URL для блогов
-  const Blogs: ISitemapField[] = allBlogs.items.flatMap(
-    ({ date, url }) => {
-      const lastmod = date ? new Date(date).toISOString() : new Date().toISOString();
-      const loc = `${Url}/blog/${url}`;
+  const Blogs: ISitemapField[] = allBlogs.items.flatMap(({ date, url }) => {
+    const lastmod = date
+      ? new Date(date).toISOString()
+      : new Date().toISOString();
+    const loc = `${Url}/blog/${url}`;
 
-      return [
-        {
-          loc,
-          lastmod,
-          changefreq: "weekly",
-          priority: "0.8" as any, 
-        },
-      ];
-    },
-  );
+    return [
+      {
+        loc,
+        lastmod,
+        changefreq: "weekly",
+        priority: "0.8" as any,
+      },
+    ];
+  });
 
   // Генерация URL для новостей
-  const News: ISitemapField[] = allNews.items.flatMap(
-    ({ date, url }) => {
-      const lastmod = date ? new Date(date).toISOString() : new Date().toISOString();
-      const loc = `${Url}/news/${url}`;
+  const News: ISitemapField[] = allNews.items.flatMap(({ date, url }) => {
+    const lastmod = date
+      ? new Date(date).toISOString()
+      : new Date().toISOString();
+    const loc = `${Url}/news/${url}`;
 
-      return [
-        {
-          loc,
-          lastmod,
-          changefreq: "daily",
-          priority: "0.8" as any,
-        },
-      ];
-    },
-  );
+    return [
+      {
+        loc,
+        lastmod,
+        changefreq: "daily",
+        priority: "0.8" as any,
+      },
+    ];
+  });
 
   const routes: ISitemapField[] = [
     {
