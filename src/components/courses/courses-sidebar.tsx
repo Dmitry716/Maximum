@@ -1,7 +1,7 @@
 "use client";
 import { Categories, CourseQueryParams } from "@/types/type";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
 
 export default function CoursesSidebar({
@@ -14,38 +14,13 @@ export default function CoursesSidebar({
   setSearchParams: (queryParams: CourseQueryParams) => void;
   categories?: Categories[];
 }) {
-  const { categories: selectedCategories, search, level } = searchParams;
-  const [minSlider, setMinSlider] = useState(0);
-  const [maxSlider, setMaxSlider] = useState(100);
+  const { categories: selectedCategories, search } = searchParams;
   const router = useRouter();
-
-  const SLIDER_MIN = 0;
-  const SLIDER_MAX = 100;
-  const REAL_MAX = 1000000;
-
-  const minPrice = Math.floor((minSlider / SLIDER_MAX) * REAL_MAX);
-  const maxPrice =
-    maxSlider === SLIDER_MAX
-      ? REAL_MAX
-      : Math.floor((maxSlider / SLIDER_MAX) * REAL_MAX);
-
-  const handleMinSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = +e.target.value;
-    setMinSlider(Math.min(value, maxSlider));
-  };
-
-  const handleMaxSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = +e.target.value;
-    setMaxSlider(Math.max(value, minSlider));
-  };
 
   const applyFilters = () => {
     setSearchParams({
       search,
       categories: selectedCategories,
-      minPrice,
-      maxPrice,
-      level,
     });
   };
 
@@ -55,21 +30,25 @@ export default function CoursesSidebar({
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [minPrice, maxPrice, search, selectedCategories, level]);
+  }, [search, selectedCategories]);
 
   const toggleCategory = (id: number) => {
     const idStr = String(id);
     let oldSelectedCategories: string[] = selectedCategories || [];
     const includesId = oldSelectedCategories.includes(idStr);
-    let newSelectedCategories: string[] = selectedCategories || [];
+    let newSelectedCategories: string[] | undefined = selectedCategories || [];
     if (includesId) {
       newSelectedCategories = newSelectedCategories?.filter(
         (catId) => catId !== idStr,
       );
     } else {
-      newSelectedCategories = [...newSelectedCategories, idStr];
+      if (oldSelectedCategories.includes("all")) {
+        newSelectedCategories = undefined;
+      } else {
+        newSelectedCategories = [...newSelectedCategories, idStr];
+      }
     }
-    setSearchParams({ categories: newSelectedCategories, page: 1 });
+    setSearchParams({ categories: newSelectedCategories, page: 1, search: "" });
   };
 
   return (
@@ -104,10 +83,10 @@ export default function CoursesSidebar({
               <input
                 className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
                 type="checkbox"
-                checked={selectedCategories?.length === 0}
+                checked={!selectedCategories}
                 onChange={() => {
                   router.push("/courses");
-                  setSearchParams({ categories: [] });
+                  setSearchParams({ categories: undefined });
                 }}
                 id="AllCategories"
               />
@@ -124,9 +103,9 @@ export default function CoursesSidebar({
               <div key={category.id} className="flex justify-between mt-2">
                 <div className="inline-flex items-center mb-0">
                   <input
-                    checked={searchParams.categories?.includes(
-                      String(category.id),
-                    )}
+                    checked={
+                      !!searchParams.categories?.includes(String(category.id))
+                    }
                     className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
                     type="checkbox"
                     onChange={() => toggleCategory(Number(category.id))}

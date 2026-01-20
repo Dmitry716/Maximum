@@ -12,16 +12,12 @@ import {
 } from "nuqs";
 import { useEffect } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { useIsMobile } from "../ui/use-mobile";
 import CoursesOne from "./courses-one";
 import CoursesSidebar from "./courses-sidebar";
 
 export const coursesSearchParamsMap: ParserMap = {
   categories: parseAsArrayOf(parseAsString),
-  level: parseAsString,
   limit: parseAsInteger,
-  maxPrice: parseAsInteger,
-  minPrice: parseAsInteger,
   page: parseAsInteger,
   search: parseAsString,
 };
@@ -35,14 +31,12 @@ export default function Courses({
   categories: any;
   ages: any;
 }) {
-  const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useQueryStates(
     coursesSearchParamsMap,
     {
       scroll: true,
     },
   );
-  console.log(searchParams.page);
   const { data: courses, isLoading } = useQuery({
     queryKey: ["courses", searchParams],
     queryFn: () => getAllCoursesPublic(searchParams),
