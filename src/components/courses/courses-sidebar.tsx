@@ -32,23 +32,31 @@ export default function CoursesSidebar({
     return () => clearTimeout(timeout);
   }, [search, selectedCategories]);
 
-  const toggleCategory = (id: number) => {
-    const idStr = String(id);
+  const toggleCategory = (url: string) => {
     let oldSelectedCategories: string[] = selectedCategories || [];
-    const includesId = oldSelectedCategories.includes(idStr);
-    let newSelectedCategories: string[] | undefined = selectedCategories || [];
+    const includesId = oldSelectedCategories.includes(url);
+    let newSelectedCategories: string[] | undefined = [];
     if (includesId) {
-      newSelectedCategories = newSelectedCategories?.filter(
-        (catId) => catId !== idStr,
+      newSelectedCategories = oldSelectedCategories?.filter(
+        (catUrl) => catUrl !== url,
       );
     } else {
-      if (oldSelectedCategories.includes("all")) {
-        newSelectedCategories = undefined;
-      } else {
-        newSelectedCategories = [...newSelectedCategories, idStr];
-      }
+      oldSelectedCategories = oldSelectedCategories.filter(
+        (catUrl) => catUrl !== "all",
+      );
+      newSelectedCategories = [...oldSelectedCategories, url];
     }
-    setSearchParams({ categories: newSelectedCategories, page: 1, search: "" });
+    if (
+      newSelectedCategories.length === 0 ||
+      newSelectedCategories.length === categories.length
+    ) {
+      newSelectedCategories = ["all"];
+    }
+    setSearchParams({
+      categories: newSelectedCategories,
+      page: 1,
+      search: null,
+    });
   };
 
   return (
@@ -63,7 +71,7 @@ export default function CoursesSidebar({
             <FiSearch className="absolute top-[10px] start-3 size-5" />
             <input
               onChange={(e) => setSearchParams({ search: e.target.value })}
-              value={search}
+              value={search || ""}
               name="search"
               id="searchname"
               type="text"
@@ -83,10 +91,13 @@ export default function CoursesSidebar({
               <input
                 className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
                 type="checkbox"
-                checked={!selectedCategories}
-                onChange={() => {
-                  router.push("/courses");
-                  setSearchParams({ categories: undefined });
+                checked={selectedCategories?.includes("all")}
+                onChange={(e) => {
+                  setSearchParams({
+                    categories: ["all"],
+                    page: 1,
+                    search: null,
+                  });
                 }}
                 id="AllCategories"
               />
@@ -103,12 +114,10 @@ export default function CoursesSidebar({
               <div key={category.id} className="flex justify-between mt-2">
                 <div className="inline-flex items-center mb-0">
                   <input
-                    checked={
-                      !!searchParams.categories?.includes(String(category.id))
-                    }
+                    checked={!!searchParams.categories?.includes(category.url)}
                     className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
                     type="checkbox"
-                    onChange={() => toggleCategory(Number(category.id))}
+                    onChange={() => toggleCategory(category.url)}
                     value={category.id}
                     id={`category-${category.id}`}
                   />

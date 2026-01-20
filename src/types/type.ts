@@ -1,4 +1,12 @@
-import { ApplicationStatus, BlogPostStatus, CourseLevel, CourseStatus, NewsStatus, UserRole, UserStatus } from "./enum";
+import {
+  ApplicationStatus,
+  BlogPostStatus,
+  CourseLevel,
+  CourseStatus,
+  NewsStatus,
+  UserRole,
+  UserStatus,
+} from "./enum";
 
 export interface Categories {
   id: string;
@@ -21,24 +29,24 @@ export enum NotificationType {
 }
 
 export interface DashboardStats {
-  totalStudents: number
-  activeCourses: number
-  totalRevenue: number
-  averageCompletionRate: number
-  monthlyCompletionAndEnrollment: MonthlyCompletionAndEnrollment[]
-  courseEnrollmentStats: CourseEnrollmentStats[]
+  totalStudents: number;
+  activeCourses: number;
+  totalRevenue: number;
+  averageCompletionRate: number;
+  monthlyCompletionAndEnrollment: MonthlyCompletionAndEnrollment[];
+  courseEnrollmentStats: CourseEnrollmentStats[];
 }
 
 export interface MonthlyCompletionAndEnrollment {
-  name: string
-  enrollments: number
-  completions: number
+  name: string;
+  enrollments: number;
+  completions: number;
 }
 
 export interface CourseEnrollmentStats {
-  color: string
-  name: string
-  value: number
+  color: string;
+  name: string;
+  value: number;
 }
 
 export interface User {
@@ -47,15 +55,15 @@ export interface User {
   email: string;
   password: string;
   role: UserRole;
-  phone?: string,
+  phone?: string;
   avatar?: string;
-  status?: UserStatus,
-  birthDate?: string,
-  occupation?: string,
-  education?: string,
-  website?: string,
-  biography?: string,
-  location?: string,
+  status?: UserStatus;
+  birthDate?: string;
+  occupation?: string;
+  education?: string;
+  website?: string;
+  biography?: string;
+  location?: string;
   registrationDate: string;
 }
 
@@ -107,8 +115,8 @@ export type Course = {
 export type Images = {
   id?: number;
   url: string;
-  videoUrl?: string;  
-}
+  videoUrl?: string;
+};
 
 export interface PaginatedCourses {
   items: Course[];
@@ -122,7 +130,7 @@ export interface CourseQueryParams {
   minPrice?: number;
   maxPrice?: number;
   level?: string;
-  search?: string;
+  search?: string | null;
   limit?: number;
   page?: number;
 }
@@ -145,7 +153,7 @@ export type CreateGroup = {
   maxStudents: number;
   courseId: number;
   schedule: Schedule[];
-}
+};
 
 type Schedule = {
   id: number;
@@ -172,7 +180,7 @@ export type UpdateCourse = {
   metaTitle?: string | null;
   metaDescription?: string | null;
   keywords?: string | null;
-  isShow?: boolean
+  isShow?: boolean;
 };
 
 export type FileRes = {
@@ -183,108 +191,107 @@ export type FileRes = {
   fileType: string;
   entityType: string;
   uploadedById: number;
-}
+};
 
 export interface NewsItem {
-  id: number
-  title: string
-  content: string
+  id: number;
+  title: string;
+  content: string;
   author?: {
-    id: number
-    name: string
-    avatar?: string
-  }
-  date: Date
-  url: string
-  image?: string
-  category?: string
-  status: NewsStatus
-  createdAt: Date
-  updatedAt: Date
+    id: number;
+    name: string;
+    avatar?: string;
+  };
+  date: Date;
+  url: string;
+  image?: string;
+  category?: string;
+  status: NewsStatus;
+  createdAt: Date;
+  updatedAt: Date;
   metaTitle?: string | null;
   metaDescription?: string | null;
   keywords?: string | null;
 }
 
 export interface NewsListResponse {
-  data: NewsItem[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
+  data: NewsItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export interface CreateNewsRequest {
-  title: string
-  content: string
-  image?: string
-  category?: string
-  status: NewsStatus
-  authorId?: number
+  title: string;
+  content: string;
+  image?: string;
+  category?: string;
+  status: NewsStatus;
+  authorId?: number;
 }
 
 export interface Blog {
-  id: number,
-  title: string,
-  content: string,
-  author: User,
-  authorId: number,
-  date: Date,
+  id: number;
+  title: string;
+  content: string;
+  author: User;
+  authorId: number;
+  date: Date;
   images: string[];
-  category: string,
-  status: BlogPostStatus,
-  tags: string[],
-  url: string
-  createdAt: Date,
-  updatedAt: Date
+  category: string;
+  status: BlogPostStatus;
+  tags: string[];
+  url: string;
+  createdAt: Date;
+  updatedAt: Date;
   metaTitle?: string | null;
   metaDescription?: string | null;
   keywords?: string | null;
 }
 
 export interface UpdateBlog {
-  title: string,
-  content: string,
-  images: string[],
-  category: string,
-  url: string
-  status: BlogPostStatus,
-  tags: string[],
-  authorId: number
+  title: string;
+  content: string;
+  images: string[];
+  category: string;
+  url: string;
+  status: BlogPostStatus;
+  tags: string[];
+  authorId: number;
   metaTitle?: string | null;
   metaDescription?: string | null;
   keywords?: string | null;
 }
 
 export interface CreateApplication {
-  childName: string,
-  parentPhone: string,
-  status: ApplicationStatus
-  groupId?: number
-  photo?: string,
-  age?: number,
-  courseId?: number,
-  parentEmail?: string,
-  message?: string,
+  childName: string;
+  parentPhone: string;
+  status: ApplicationStatus;
+  groupId?: number;
+  photo?: string;
+  age?: number;
+  courseId?: number;
+  parentEmail?: string;
+  message?: string;
 }
 
 export interface CreateUserAndBindGroup {
-  childName: string,
-  parentPhone: string,
-  groupId: number,
-  parentEmail: string,
+  childName: string;
+  parentPhone: string;
+  groupId: number;
+  parentEmail: string;
 }
 
 export type UpdateApplication = CreateApplication & {
-  id: number
-  responseMessage?: string
-}
-
+  id: number;
+  responseMessage?: string;
+};
 
 export type Application = CreateApplication & {
-  id: number,
-  responseMessage?: string
-}
+  id: number;
+  responseMessage?: string;
+};
 
 export type ApplicationWithLoading = Application & { isLoading?: boolean };
 

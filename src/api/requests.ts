@@ -170,7 +170,6 @@ export async function getAllCoursesPublic(
   filters: CourseQueryParams = {},
 ): Promise<PaginatedCourses> {
   const params: Record<string, any> = {};
-  console.trace();
   if (filters.categories && filters.categories.length > 0) {
     params.categories = filters.categories.join(",");
   }

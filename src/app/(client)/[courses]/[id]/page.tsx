@@ -49,9 +49,7 @@ export async function generateMetadata({
       images: imgUrl ? [imgUrl] : [],
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/${
-        (await params).courses
-      }/${id}`,
+      canonical: `${process.env.NEXT_PUBLIC_API_URL}/courses/${id}`,
     },
   };
 }
@@ -61,18 +59,19 @@ export async function generateStaticParams() {
     const courses = await getAllCoursesPublic({ limit: 1000, page: 1 });
 
     return courses.items
-      .filter((course) =>
-        course.category &&
-        typeof course.category !== "string" &&
-        course.category.url &&
-        course.category.url !== "courses"
+      .filter(
+        (course) =>
+          course.category &&
+          typeof course.category !== "string" &&
+          course.category.url &&
+          course.category.url !== "courses",
       )
       .map((course) => ({
         id: course.url,
         courses: (course.category as any)?.url,
       }));
   } catch (error) {
-    console.error('Error generating static params:', error);
+    console.error("Error generating static params:", error);
     return []; // Возвращаем пустой массив в случае ошибки
   }
 }
@@ -131,7 +130,6 @@ export default async function Page(props: { params: paramsType }) {
         id="course-schema"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
       />
-
 
       <Navbar navlight={true} tagline={false} />
       {course && courses && (

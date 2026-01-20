@@ -4,8 +4,8 @@ import { getAllCoursesPublic } from "@/api/requests";
 import { Course } from "@/types/type";
 import { useQuery } from "@tanstack/react-query";
 import {
-  parseAsArrayOf,
   parseAsInteger,
+  parseAsNativeArrayOf,
   parseAsString,
   ParserMap,
   useQueryStates,
@@ -16,7 +16,7 @@ import CoursesOne from "./courses-one";
 import CoursesSidebar from "./courses-sidebar";
 
 export const coursesSearchParamsMap: ParserMap = {
-  categories: parseAsArrayOf(parseAsString),
+  categories: parseAsNativeArrayOf(parseAsString),
   limit: parseAsInteger,
   page: parseAsInteger,
   search: parseAsString,
@@ -39,7 +39,24 @@ export default function Courses({
   );
   const { data: courses, isLoading } = useQuery({
     queryKey: ["courses", searchParams],
-    queryFn: () => getAllCoursesPublic(searchParams),
+    queryFn: () => {
+      let mappedCategories = [];
+      if (searchParams.categories.includes("all")) {
+        mappedCategories = [];
+      } else {
+        mappedCategories = searchParams.categories.map(
+          (catUrl: string) =>
+            categories.find(
+              (cat: { url: string; id: number }) => cat.url === catUrl,
+            ).id,
+        );
+      }
+      const search = {
+        ...searchParams,
+        categories: mappedCategories,
+      };
+      return getAllCoursesPublic(search);
+    },
     staleTime: 1000 * 60 * 5,
     retry: 3,
     placeholderData: (previousData) => previousData,
