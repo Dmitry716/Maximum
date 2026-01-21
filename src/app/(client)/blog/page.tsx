@@ -1,16 +1,15 @@
-import React from "react";
-import Link from "next/link";
-import Navbar from "@/components/navbar/navbar";
+import { getBlogs, getSeoSettingsByPageName } from "@/api/requests";
+import Blog from "@/components/blog";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { getBlogs } from "@/api/requests";
-import Blog from "@/components/blog";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { getSeoSettingsByPageName } from "@/api/requests"; // Импортируем нашу новую функцию
-import { Metadata } from "next";
+import { env } from "@/lib/env";
 import { SeoSetting as SeoSettingType } from "@/types/type";
+import { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string | undefined }>;
@@ -53,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Если ogImage не задан — используем дефолтное изображение
   if (!ogImageUrl) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
   }
 
   // Если ogImage начинается с http:// или https:// — оставляем как есть
@@ -63,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
     !ogImageUrl.startsWith("http://") &&
     !ogImageUrl.startsWith("https://")
   ) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
   }
   return {
     title,
@@ -74,7 +73,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description:
         seoData?.metaDescription ||
         "Полезные материалы, советы и актуальные блог от спортивно-образовательного центра «Максимум» в Витебске.", // Используем то же, что и в description
-      url: `${process.env.NEXT_PUBLIC_API_URL}/blog`,
+      url: `${env.NEXT_PUBLIC_SITE_URL}/blog`,
       siteName: "Максимум",
       type: "website",
       images: [
@@ -96,7 +95,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [ogImageUrl],
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/blog`,
+      canonical: `${env.NEXT_PUBLIC_SITE_URL}/blog`,
     },
   };
 }
@@ -122,7 +121,7 @@ export default async function BlogsPage({ searchParams }: Props) {
     name: "Блог | статьи центра «Максимум»",
     description:
       "Читайте свежие статьи, полезные советы и блог из жизни спортивно-образовательного центра «Максимум» в Витебске.",
-    url: `${process.env.NEXT_PUBLIC_API_URL}/blog`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}/blog`,
     mainEntity: {
       "@type": "ItemList",
       itemListElement: blogs.map((blog, index) => ({
@@ -131,7 +130,7 @@ export default async function BlogsPage({ searchParams }: Props) {
         item: {
           "@type": "BlogPosting",
           headline: blog.title,
-          url: `${process.env.NEXT_PUBLIC_API_URL}/blog/${blog.url}`,
+          url: `${env.NEXT_PUBLIC_SITE_URL}/blog/${blog.url}`,
           datePublished: blog.date
             ? new Date(blog.date).toISOString()
             : undefined,
@@ -140,7 +139,7 @@ export default async function BlogsPage({ searchParams }: Props) {
             name: blog.author?.name || "Центр «Максимум»",
           },
           image: blog.images?.[0]
-            ? `${process.env.NEXT_PUBLIC_API_URL}/${blog.images[0]}`
+            ? `${env.NEXT_PUBLIC_API_URL}/${blog.images[0]}`
             : undefined,
         },
       })),
@@ -155,7 +154,7 @@ export default async function BlogsPage({ searchParams }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
 
-      <Navbar navlight={true} tagline={false} />
+      <Navbar navlight={true} />
 
       <section
         className="relative table w-full py-32 lg:py-64 bg-no-repeat bg-center bg-cover"

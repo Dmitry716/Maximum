@@ -1,19 +1,19 @@
-import React from "react";
-import Navbar from "@/components/navbar/navbar";
+import { getBlogByUrlServer, getBlogsServer } from "@/api/server-requests";
 import Blog from "@/components/blog";
+import BlogsSidebar from "@/components/blog-sidebar";
+import { ClientRenderNovel } from "@/components/client-render-novel";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { getBlogByUrlServer, getBlogsServer } from "@/api/server-requests";
+import { env } from "@/lib/env";
 import { Blog as BlogType } from "@/types/type";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { Metadata } from "next";
-import BlogsSidebar from "@/components/blog-sidebar";
-import { notFound } from "next/navigation";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import Script from "next/script";
-import { ClientRenderNovel } from "@/components/client-render-novel";
 
 export async function generateMetadata({
   params,
@@ -28,9 +28,7 @@ export async function generateMetadata({
     if (!blog) return {};
 
     const imgPath = blog.images?.length > 0 ? blog.images[0] : null;
-    const imgUrl = imgPath
-      ? `${process.env.NEXT_PUBLIC_API_URL}/${imgPath}`
-      : null;
+    const imgUrl = imgPath ? `${env.NEXT_PUBLIC_API_URL}/${imgPath}` : null;
 
     return {
       title: blog.metaTitle || blog.title,
@@ -41,7 +39,9 @@ export async function generateMetadata({
         description: blog.metaDescription || blog.title,
         images: imgUrl ? [imgUrl] : [],
         type: "article",
-        publishedTime: blog.date ? new Date(blog.date).toISOString() : undefined,
+        publishedTime: blog.date
+          ? new Date(blog.date).toISOString()
+          : undefined,
         modifiedTime: blog.updatedAt
           ? new Date(blog.updatedAt).toISOString()
           : undefined,
@@ -53,15 +53,15 @@ export async function generateMetadata({
         images: imgUrl ? [imgUrl] : [],
       },
       alternates: {
-        canonical: `https://maxximum.by/blog/${id}`,
+        canonical: `${env.NEXT_PUBLIC_SITE_URL}/blog/${id}`,
       },
     };
   } catch (error: any) {
-    console.error('Error generating metadata for blog:', error);
+    console.error("Error generating metadata for blog:", error);
     // Возвращаем базовые метаданные в случае ошибки
     return {
-      title: 'Блог - Центр Максимум',
-      description: 'Спортивно-образовательный центр Максимум',
+      title: "Блог - Центр Максимум",
+      description: "Спортивно-образовательный центр Максимум",
     };
   }
 }
@@ -80,7 +80,7 @@ export async function generateMetadata({
 //   }
 // }
 
-export const dynamic = 'force-dynamic'; // Принудительно делаем страницу динамической
+export const dynamic = "force-dynamic"; // Принудительно делаем страницу динамической
 export const revalidate = 0; // Отключаем кеширование для диагностики
 export const dynamicParams = true; // Разрешить динамические параметры
 
@@ -92,49 +92,57 @@ export default async function Page(props: { params: paramsType }) {
   let blog = null;
   try {
     blog = await getBlogByUrlServer(id);
-    
+
     // Дополнительная проверка на корректность данных
     if (!blog || !blog.title) {
-      console.error('Blog data is incomplete:', blog);
+      console.error("Blog data is incomplete:", blog);
       return notFound();
     }
   } catch (error: any) {
-    console.error('Error in blog page component:', error);
-    console.error('Blog ID:', id);
-    console.error('API URL:', process.env.NEXT_PUBLIC_API_URL);
-    
-    if (error.message?.includes('Blog not found') || 
-        error.message?.includes('404') ||
-        error.message?.includes('Invalid blog data')) {
+    console.error("Error in blog page component:", error);
+    console.error("Blog ID:", id);
+    console.error("API URL:", env.NEXT_PUBLIC_API_URL);
+
+    if (
+      error.message?.includes("Blog not found") ||
+      error.message?.includes("404") ||
+      error.message?.includes("Invalid blog data")
+    ) {
       return notFound();
     }
-    
+
     // Для других ошибок (500, сетевые) тоже показываем 404, чтобы не ломать сайт
-    console.error('Unexpected error, returning 404:', error.message);
+    console.error("Unexpected error, returning 404:", error.message);
     return notFound();
   }
 
   // Безопасное получение связанных постов
-  let relatedPosts: { items: BlogType[]; total: number } = { items: [], total: 0 };
+  let relatedPosts: { items: BlogType[]; total: number } = {
+    items: [],
+    total: 0,
+  };
   try {
     relatedPosts = await getBlogsServer(
       1,
       3,
       "published",
       blog.category,
-      blog.id
+      blog.id,
     );
   } catch (error: any) {
-    console.error('Error fetching related posts:', error);
+    console.error("Error fetching related posts:", error);
     // Продолжаем без связанных постов
   }
 
   // Безопасное получение последних постов
-  let latestPosts: { items: BlogType[]; total: number } = { items: [], total: 0 };
+  let latestPosts: { items: BlogType[]; total: number } = {
+    items: [],
+    total: 0,
+  };
   try {
     latestPosts = await getBlogsServer(1, 5, "published");
   } catch (error: any) {
-    console.error('Error fetching latest posts:', error);
+    console.error("Error fetching latest posts:", error);
     // Продолжаем без последних постов
   }
 
@@ -144,7 +152,7 @@ export default async function Page(props: { params: paramsType }) {
     "@type": "BlogPosting",
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://maxximum.by/blog/${blog.url}`,
+      "@id": `${env.NEXT_PUBLIC_SITE_URL}/blog/${blog.url}`,
     },
     headline: blog.title,
     description: blog.metaDescription || blog.title,
@@ -161,11 +169,11 @@ export default async function Page(props: { params: paramsType }) {
       name: "Спортивно-образовательный центр «Максимум»",
       logo: {
         "@type": "ImageObject",
-        url: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+        url: `${env.NEXT_PUBLIC_SITE_URL}/logo.webp`,
       },
     },
     image: blog.images?.[0]
-      ? `${process.env.NEXT_PUBLIC_API_URL}/${blog.images[0]}`
+      ? `${env.NEXT_PUBLIC_SITE_URL}/${blog.images[0]}`
       : undefined,
   };
 
@@ -177,7 +185,7 @@ export default async function Page(props: { params: paramsType }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingSchema) }}
       />
 
-      <Navbar navlight={true} tagline={false} />
+      <Navbar navlight={true} />
 
       <section
         className="relative table w-full py-32 lg:py-44 bg-no-repeat bg-center bg-cover"
@@ -225,22 +233,25 @@ export default async function Page(props: { params: paramsType }) {
               <div className="relative lg:p-6 md:p-4 p-2 overflow-hidden rounded-xl shadow dark:shadow-gray-800">
                 {blog?.images && blog.images.length > 0 && (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/${blog.images[0]}`}
+                    src={`${env.NEXT_PUBLIC_API_URL}/${blog.images[0]}`}
                     width={1000}
                     height={700}
                     className="object-contain"
                     alt="blog images"
-          />
-        )}
-        {blog?.content && <ClientRenderNovel contentFromDB={blog?.content} />}
-      </div>
-    </div>            <div className="lg:col-span-4 ">
+                  />
+                )}
+                {blog?.content && (
+                  <ClientRenderNovel contentFromDB={blog?.content} />
+                )}
+              </div>
+            </div>{" "}
+            <div className="lg:col-span-4 ">
               {latestPosts && (
                 <BlogsSidebar
                   title={"Недавние посты"}
                   isBlog
                   blogRecentPost={latestPosts.items.filter(
-                    (item: any) => item.id !== blog.id
+                    (item: any) => item.id !== blog.id,
                   )}
                 />
               )}

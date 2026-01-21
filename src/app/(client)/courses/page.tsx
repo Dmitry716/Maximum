@@ -9,6 +9,7 @@ import Footer from "@/components/footer";
 import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
+import { env } from "@/lib/env";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -40,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Если ogImage не задан — используем дефолтное изображение
   if (!ogImageUrl) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
   }
 
   // Если ogImage начинается с http:// или https:// — оставляем как есть
@@ -50,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     !ogImageUrl.startsWith("http://") &&
     !ogImageUrl.startsWith("https://")
   ) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
   }
 
   return {
@@ -62,7 +63,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description:
         seoData?.metaDescription ||
         `Найдите лучшие курсы для вашего ребенка в Maximum.`,
-      url: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
+      url: `${env.NEXT_PUBLIC_API_URL}/courses`,
       type: "website",
       images: [
         {
@@ -83,7 +84,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [ogImageUrl],
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
+      canonical: `${env.NEXT_PUBLIC_API_URL}/courses`,
     },
   };
 }
@@ -109,7 +110,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
     name: "Курсы | Maximum",
     description:
       "Найдите лучшие курсы для вашего ребенка в Maximum. Качественное образование и развитие навыков.",
-    url: `${process.env.NEXT_PUBLIC_API_URL}/courses`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}/courses`,
     mainEntity: {
       "@type": "ItemList",
       itemListElement: allCourses.items.map((course, index) => ({
@@ -119,7 +120,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
           "@type": "Course",
           name: course.name,
           description: course.description,
-          url: `${process.env.NEXT_PUBLIC_API_URL}/${
+          url: `${env.NEXT_PUBLIC_SITE_URL}/${
             course.category && typeof course.category !== "string"
               ? course.category.url
               : "courses"
@@ -127,7 +128,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
           provider: {
             "@type": "Organization",
             name: "Спортивно-образовательный центр «Максимум»",
-            url: process.env.NEXT_PUBLIC_API_URL,
+            url: env.NEXT_PUBLIC_SITE_URL,
           },
         },
       })),
@@ -142,7 +143,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
 
-      <Navbar navlight={false} tagline={false} />
+      <Navbar navlight={false} />
 
       {/*  breadcrumb */}
       <section

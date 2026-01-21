@@ -1,20 +1,19 @@
-import React from "react";
-import Image from "next/image";
-import Navbar from "@/components/navbar/navbar";
-import BlogsSidebar from "@/components/blog-sidebar";
+import { getNewsByUrlServer, getNewsServer } from "@/api/server-requests";
 import Blog from "@/components/blog";
+import BlogsSidebar from "@/components/blog-sidebar";
+import { ClientImage } from "@/components/client-image";
+import { ClientOnlyRenderNovel } from "@/components/client-only-render-novel";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { getNewsServer, getNewsByUrlServer } from "@/api/server-requests";
+import { env } from "@/lib/env";
 import { NewsItem } from "@/types/type";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import { ClientOnlyRenderNovel } from "@/components/client-only-render-novel";
-import { ClientImage } from "@/components/client-image";
 
 export async function generateMetadata({
   params,
@@ -24,7 +23,7 @@ export async function generateMetadata({
   try {
     const { id } = await params;
     if (!id) return {};
-    
+
     const news = await getNewsByUrlServer(id);
 
     if (!news) return {};
@@ -43,7 +42,9 @@ export async function generateMetadata({
         description: news.metaDescription || news.title,
         images: imgUrl ? [imgUrl] : [],
         type: "article",
-        publishedTime: news.date ? new Date(news.date).toISOString() : undefined,
+        publishedTime: news.date
+          ? new Date(news.date).toISOString()
+          : undefined,
         modifiedTime: news.updatedAt
           ? new Date(news.updatedAt).toISOString()
           : undefined,
@@ -59,11 +60,11 @@ export async function generateMetadata({
       },
     };
   } catch (error: any) {
-    console.error('Error generating metadata for news:', error);
+    console.error("Error generating metadata for news:", error);
     // Возвращаем базовые метаданные в случае ошибки
     return {
-      title: 'Новость - Центр Максимум',
-      description: 'Спортивно-образовательный центр Максимум',
+      title: "Новость - Центр Максимум",
+      description: "Спортивно-образовательный центр Максимум",
     };
   }
 }
@@ -76,7 +77,7 @@ export async function generateStaticParams() {
       id: blog.url,
     }));
   } catch (error: any) {
-    console.error('Error generating static params:', error);
+    console.error("Error generating static params:", error);
     return []; // Возвращаем пустой массив в случае ошибки
   }
 }
@@ -94,22 +95,34 @@ export default async function Page({ params }: { params: paramsType }) {
   try {
     blog = await getNewsByUrlServer(id);
   } catch (error: any) {
-    console.error('Error fetching news:', error);
-    console.error('API URL being called:', `${process.env.NEXT_PUBLIC_API_URL}/api/news/url/${id}`);
-    
-    if (error.message?.includes('News not found') || error.message?.includes('404')) {
+    console.error("Error fetching news:", error);
+    console.error(
+      "API URL being called:",
+      `${env.NEXT_PUBLIC_API_URL}/api/news/url/${id}`,
+    );
+
+    if (
+      error.message?.includes("News not found") ||
+      error.message?.includes("404")
+    ) {
       return notFound();
     }
     throw error;
   }
 
   if (!blog) {
-    console.error('Blog is null or undefined after successful API call');
+    console.error("Blog is null or undefined after successful API call");
     return notFound();
   }
 
-  let relatedPosts: { items: NewsItem[]; total: number } = { items: [], total: 0 };
-  let latestPosts: { items: NewsItem[]; total: number } = { items: [], total: 0 };
+  let relatedPosts: { items: NewsItem[]; total: number } = {
+    items: [],
+    total: 0,
+  };
+  let latestPosts: { items: NewsItem[]; total: number } = {
+    items: [],
+    total: 0,
+  };
 
   try {
     relatedPosts = await getNewsServer(
@@ -117,16 +130,16 @@ export default async function Page({ params }: { params: paramsType }) {
       3,
       "published",
       blog.category,
-      blog.id
+      blog.id,
     );
   } catch (error: any) {
-    console.error('Error fetching related posts:', error);
+    console.error("Error fetching related posts:", error);
   }
 
   try {
     latestPosts = await getNewsServer(1, 5, "published");
   } catch (error: any) {
-    console.error('Error fetching latest posts:', error);
+    console.error("Error fetching latest posts:", error);
   }
 
   // JSON-LD для отдельной новости
@@ -152,12 +165,10 @@ export default async function Page({ params }: { params: paramsType }) {
       name: "Спортивно-образовательный центр «Максимум»",
       logo: {
         "@type": "ImageObject",
-        url: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+        url: `${env.NEXT_PUBLIC_SITE_URL}/logo.webp`,
       },
     },
-    image: blog.image
-      ? `${process.env.NEXT_PUBLIC_API_URL}/${blog.image}`
-      : undefined,
+    image: blog.image ? `${env.NEXT_PUBLIC_API_URL}/${blog.image}` : undefined,
   };
 
   return (
@@ -168,7 +179,7 @@ export default async function Page({ params }: { params: paramsType }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(newsArticleSchema) }}
       />
 
-      <Navbar navlight={true} tagline={false} />
+      <Navbar navlight={true} />
 
       <section
         className="relative table w-full py-32 lg:py-44 bg-no-repeat bg-center bg-cover"
@@ -216,7 +227,7 @@ export default async function Page({ params }: { params: paramsType }) {
               <div className="relative lg:p-6 md:p-4 p-2 overflow-hidden rounded-xl shadow dark:shadow-gray-800">
                 {blog?.image && (
                   <ClientImage
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/${blog?.image}`}
+                    src={`${env.NEXT_PUBLIC_API_URL}/${blog?.image}`}
                     width={0}
                     height={0}
                     sizes="100vw"
@@ -224,7 +235,9 @@ export default async function Page({ params }: { params: paramsType }) {
                     alt={blog.title || ""}
                   />
                 )}
-                {blog?.content && <ClientOnlyRenderNovel contentFromDB={blog?.content} />}
+                {blog?.content && (
+                  <ClientOnlyRenderNovel contentFromDB={blog?.content} />
+                )}
               </div>
             </div>
 
@@ -235,7 +248,7 @@ export default async function Page({ params }: { params: paramsType }) {
                   <BlogsSidebar
                     title={"Недавние посты"}
                     blogRecentPost={latestPosts.items.filter(
-                      (post) => post.id !== blog.id
+                      (post) => post.id !== blog.id,
                     )}
                   />
                 )}

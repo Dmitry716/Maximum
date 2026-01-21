@@ -1,4 +1,5 @@
 import { api } from "@/lib/auth";
+import { env } from "@/lib/env";
 import {
   Blog,
   Categories,
@@ -23,8 +24,8 @@ import {
 const isServer = typeof window === "undefined";
 
 export const backendUrl = isServer
-  ? process.env.API_URL
-  : process.env.NEXT_PUBLIC_API_URL;
+  ? env.API_URL
+  : env.NEXT_PUBLIC_API_URL;
 
 export async function login(values: any) {
   const res = await fetch(`${backendUrl}/api/auth/login`, {

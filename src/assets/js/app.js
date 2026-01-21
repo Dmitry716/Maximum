@@ -132,7 +132,7 @@ function activateMenu() {
     }
 }
 /*********************/
-/*  Clickable manu   */
+/*  Clickable menu   */
 /*********************/
 if (document.getElementById("navigation")) {
     var elements = document.getElementById("navigation").getElementsByTagName("a");
@@ -167,7 +167,7 @@ window.addEventListener('scroll', (ev) => {
     windowScroll();
 })
 /*********************/
-/*    Back To TOp    */
+/*    Back To Top    */
 /*********************/
 
 window.onscroll = function () {

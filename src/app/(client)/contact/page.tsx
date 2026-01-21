@@ -1,25 +1,26 @@
 "use client";
-import React, { useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
 
-import Navbar from "@/components/navbar/navbar";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 
-import { FiMail, FiMapPin, FiPhone, FiX } from "react-icons/fi";
-import Link from "next/link";
-import { z } from "zod";
+import { createApplication } from "@/api/requests";
+import { PhoneInput } from "@/components/phone-input";
+import { Label } from "@/components/ui/label";
 import { contactFormSchemaClient } from "@/lib/validations";
-import { useForm } from "react-hook-form";
+import { ApplicationStatus } from "@/types/enum";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { createApplication } from "@/api/requests";
-import { ApplicationStatus } from "@/types/enum";
-import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
-import { PhoneInput } from "@/components/phone-input";
+import Link from "next/link";
 import Script from "next/script";
+import { useForm } from "react-hook-form";
+import { FiMail, FiMapPin, FiPhone, FiX } from "react-icons/fi";
+import { toast } from "sonner";
+import { z } from "zod";
+import { env } from "@/lib/env";
 
 type ContactFormSchemaFormValues = z.infer<typeof contactFormSchemaClient>;
 
@@ -76,11 +77,11 @@ export default function Page() {
   const contactPageSchema = {
     "@context": "https://schema.org ",
     "@type": "ContactPage",
-    url: `${process.env.NEXT_PUBLIC_API_URL}/contact`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}/contact`,
     about: {
       "@type": "LocalBusiness",
       name: "Спортивно-образовательный центр «Максимум»",
-      image: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+      image: `${env.NEXT_PUBLIC_SITE_URL}/logo.webp`,
       telephone: "+375297800008",
       email: "vitebskmaximum@gmail.com",
       address: {
@@ -109,8 +110,8 @@ export default function Page() {
         id="contact-page-schema"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageSchema) }}
       />
-      
-      <Navbar navlight={false} tagline={false} />
+
+      <Navbar navlight={false} />
 
       <div className="container-fluid relative mt-20">
         <div className="grid grid-cols-1">

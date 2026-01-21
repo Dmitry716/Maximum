@@ -1,16 +1,15 @@
-import React from "react";
-import Link from "next/link";
-import Navbar from "@/components/navbar/navbar";
+import { getNews, getSeoSettingsByPageName } from "@/api/requests";
+import Blog from "@/components/blog";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { getNews } from "@/api/requests";
-import Blog from "@/components/blog";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { Metadata } from "next";
-import { getSeoSettingsByPageName } from "@/api/requests";
+import { env } from "@/lib/env";
 import { SeoSetting as SeoSettingType } from "@/types/type";
+import { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
@@ -19,10 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // Передаем 'news' как pageName, так как это страница новостей
     seoData = await getSeoSettingsByPageName("news");
   } catch (error) {
-    console.error(
-      "Error fetching SEO data for news, using defaults:",
-      error
-    );
+    console.error("Error fetching SEO data for news, using defaults:", error);
     // Просто продолжаем, seoData останется null
   }
 
@@ -50,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Если ogImage не задан — используем дефолтное изображение
   if (!ogImageUrl) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
   }
 
   // Если ogImage начинается с http:// или https:// — оставляем как есть
@@ -60,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
     !ogImageUrl.startsWith("http://") &&
     !ogImageUrl.startsWith("https://")
   ) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
   }
 
   return {
@@ -72,7 +68,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description:
         seoData?.metaDescription ||
         "Полезные материалы, советы и актуальные новости от спортивно-образовательного центра «Максимум» в Витебске.", // Используем то же, что и в description
-      url: `${process.env.NEXT_PUBLIC_API_URL}/news`,
+      url: `${env.NEXT_PUBLIC_SITE_URL}/news`,
       siteName: "Максимум",
       type: "website",
       images: [
@@ -94,7 +90,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [ogImageUrl],
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/news`,
+      canonical: `${env.NEXT_PUBLIC_SITE_URL}/news`,
     },
   };
 }
@@ -125,7 +121,7 @@ export default async function NewsPage({ searchParams }: Props) {
     name: "Новости | статьи центра «Максимум»",
     description:
       "Читайте свежие статьи, полезные советы и новости из жизни спортивно-образовательного центра «Максимум» в Витебске.",
-    url: `${process.env.NEXT_PUBLIC_API_URL}/news`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}/news`,
     mainEntity: {
       "@type": "ItemList",
       itemListElement: blogs.map((news, index) => ({
@@ -134,7 +130,7 @@ export default async function NewsPage({ searchParams }: Props) {
         item: {
           "@type": "NewsArticle",
           headline: news.title,
-          url: `${process.env.NEXT_PUBLIC_API_URL}/news/${news.url}`,
+          url: `${env.NEXT_PUBLIC_SITE_URL}/news/${news.url}`,
           datePublished: news.date
             ? new Date(news.date).toISOString()
             : undefined,
@@ -143,7 +139,7 @@ export default async function NewsPage({ searchParams }: Props) {
             name: news.author?.name || "Центр «Максимум»",
           },
           image: news.image
-            ? `${process.env.NEXT_PUBLIC_API_URL}/${news.image}`
+            ? `${env.NEXT_PUBLIC_API_URL}/${news.image}`
             : undefined,
         },
       })),
@@ -158,7 +154,7 @@ export default async function NewsPage({ searchParams }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
 
-      <Navbar navlight={true} tagline={false} />
+      <Navbar navlight={true} />
 
       <section
         className="relative table w-full py-32 lg:py-64 bg-no-repeat bg-center bg-cover"

@@ -7,6 +7,7 @@ export const env = createEnv({
     JWT_ACCESS_SECRET: z.string(),
     JWT_REFRESH_SECRET: z.string(),
     API_URL: z.string().url(),
+    NODE_ENV: z.enum(["development", "test", "production"]),
   },
 
   // Схема для клиентских переменных (обязательно NEXT_PUBLIC_)
@@ -22,5 +23,8 @@ export const env = createEnv({
     API_URL: process.env.API_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NODE_ENV: process.env.NODE_ENV,
   },
+
+  emptyStringAsUndefined: true,
 });

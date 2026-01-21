@@ -12,6 +12,7 @@ import { getSeoSettingsByPageNameServer } from "@/api/server-requests";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import Script from "next/script";
 import { getSeoFallback } from "@/lib/seo-fallback";
+import { env } from "@/lib/env";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
@@ -43,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
     !ogImageUrl.startsWith("http://") &&
     !ogImageUrl.startsWith("https://")
   ) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
   }
 
   return {
@@ -53,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `${process.env.NEXT_PUBLIC_API_URL}/about`,
+      url: `${env.NEXT_PUBLIC_SITE_URL}/about`,
       type: "website",
       images: [
         {
@@ -72,7 +73,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [ogImageUrl],
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/about`,
+      canonical: `${env.NEXT_PUBLIC_SITE_URL}/about`,
     },
   };
 }
@@ -84,8 +85,8 @@ export default function Page() {
     "@type": "Organization",
     name: "Спортивно-образовательный центр «Максимум»",
     alternateName: "Максимум",
-    url: `${process.env.NEXT_PUBLIC_API_URL}`,
-    logo: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}`,
+    logo: `${env.NEXT_PUBLIC_SITE_URL}/logo.webp`,
     description:
       "Спортивно-образовательный центр «Максимум» в Витебске — это профессиональные преподаватели, современные программы и индивидуальный подход.",
     address: {
@@ -109,7 +110,7 @@ export default function Page() {
     "@context": "https://schema.org",
     "@type": "AboutPage",
     name: "О нас | Спортивно-образовательный центр «Максимум»",
-    url: `${process.env.NEXT_PUBLIC_API_URL}/about`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}/about`,
     description:
       "Узнайте о нашем центре, о преподавателях и уникальных программах занятий в Витебске!",
     about: organizationSchema,
@@ -128,7 +129,7 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
       />
 
-      <Navbar navlight={true} tagline={false} />
+      <Navbar navlight={true} />
 
       <section
         className="relative table w-full py-32 lg:py-72 bg-no-repeat bg-center bg-cover"

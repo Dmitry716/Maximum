@@ -1,20 +1,20 @@
-import React from "react";
-import Link from "next/link";
-import Navbar from "@/components/navbar/navbar";
-import HeroSlider from "@/components/hero-slider";
+import { getSeoSettingsByPageNameServer } from "@/api/server-requests";
 import AboutOne from "@/components/about-one";
-import Features from "@/components/features";
 import CoursesTwo from "@/components/courses/courses-two";
 import Cta from "@/components/cta";
-import GetInTouch from "@/components/get-in-touch";
+import Features from "@/components/features";
 import Footer from "@/components/footer";
+import GetInTouch from "@/components/get-in-touch";
+import HeroSlider from "@/components/hero-slider";
+import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { Metadata } from "next";
-import { SeoSetting as SeoSettingType } from "@/types/type";
-import { getSeoSettingsByPageNameServer } from "@/api/server-requests";
-import Script from "next/script";
+import { env } from "@/lib/env";
 import { getSeoFallback } from "@/lib/seo-fallback";
+import { SeoSetting as SeoSettingType } from "@/types/type";
+import { Metadata } from "next";
+import Link from "next/link";
+import Script from "next/script";
 
 export async function generateMetadata(): Promise<Metadata> {
   let seoData: SeoSettingType | null = null;
@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Если ogImage не задан — используем дефолтное изображение
   if (!ogImageUrl) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}/og-image.jpg`;
   }
 
   // Если ogImage начинается с http:// или https:// — оставляем как есть
@@ -51,11 +51,11 @@ export async function generateMetadata(): Promise<Metadata> {
     !ogImageUrl.startsWith("http://") &&
     !ogImageUrl.startsWith("https://")
   ) {
-    ogImageUrl = `${process.env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
+    ogImageUrl = `${env.NEXT_PUBLIC_API_URL}${ogImageUrl}`;
   }
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_API_URL || "https://maxximum.by"),
+    metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL || "https://maxximum.by"),
     title,
     description,
     keywords,
@@ -63,7 +63,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: "website",
-      url: `${process.env.NEXT_PUBLIC_API_URL}/`, // URL главной страницы
+      url: `${env.NEXT_PUBLIC_SITE_URL}/`, // URL главной страницы
       images: [
         {
           url: ogImageUrl,
@@ -81,7 +81,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [ogImageUrl],
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/`, // Canonical для главной страницы
+      canonical: `${env.NEXT_PUBLIC_SITE_URL}/`, // Canonical для главной страницы
     },
     robots: {
       index: true,
@@ -99,8 +99,8 @@ export default function Page() {
     "@type": "Organization",
     name: "Спортивно-образовательный центр «Максимум»",
     alternateName: "Максимум",
-    url: `${process.env.NEXT_PUBLIC_API_URL}`,
-    logo: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}`,
+    logo: `${env.NEXT_PUBLIC_SITE_URL}/logo.webp`,
     description:
       "Добро пожаловать в спортивно-образовательный центр «Максимум» в Витебске. Профессиональные преподаватели, современные программы и индивидуальный подход для вашего ребенка.",
     address: {
@@ -124,10 +124,10 @@ export default function Page() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Спортивно-образовательный центр «Максимум»",
-    url: `${process.env.NEXT_PUBLIC_API_URL}/`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}/`,
     potentialAction: {
       "@type": "SearchAction",
-      target: `${process.env.NEXT_PUBLIC_API_URL}/search?q={search_term_string}`,
+      target: `${env.NEXT_PUBLIC_SITE_URL}/search?q={search_term_string}`,
       "query-input": "required name=search_term_string",
     },
   };
@@ -151,7 +151,7 @@ export default function Page() {
       />
       {/* <Tagline /> */}
 
-      <Navbar navlight={true} tagline={true} />
+      <Navbar navlight={true} />
 
       <HeroSlider />
 

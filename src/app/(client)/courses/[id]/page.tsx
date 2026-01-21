@@ -4,6 +4,7 @@ import Footer from "@/components/footer";
 import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
+import { env } from "@/lib/env";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
@@ -21,7 +22,7 @@ export async function generateMetadata({
 
   const imgPath = course.images?.length > 0 ? course.images[0].url : null;
   const imgUrl = imgPath
-    ? `${process.env.NEXT_PUBLIC_API_URL}${
+    ? `${env.NEXT_PUBLIC_API_URL}${
         imgPath.startsWith("/") ? "" : "/"
       }${imgPath}`
     : null;
@@ -49,7 +50,7 @@ export async function generateMetadata({
       images: imgUrl ? [imgUrl] : [],
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_API_URL}/courses/${id}`,
+      canonical: `${env.NEXT_PUBLIC_SITE_URL}/courses/${id}`,
     },
   };
 }
@@ -102,12 +103,12 @@ export default async function Page(props: { params: paramsType }) {
     provider: {
       "@type": "Organization",
       name: "Спортивно-образовательный центр «Максимум»",
-      sameAs: `${process.env.NEXT_PUBLIC_API_URL}`,
-      logo: `${process.env.NEXT_PUBLIC_API_URL}/logo.webp`,
+      sameAs: `${env.NEXT_PUBLIC_SITE_URL}`,
+      logo: `${env.NEXT_PUBLIC_SITE_URL}/logo.webp`,
     },
-    url: `${process.env.NEXT_PUBLIC_API_URL}/courses/${course.url}`,
+    url: `${env.NEXT_PUBLIC_SITE_URL}/courses/${course.url}`,
     image: course.images?.[0]?.url
-      ? `${process.env.NEXT_PUBLIC_API_URL}${course.images[0].url}`
+      ? `${env.NEXT_PUBLIC_API_URL}${course.images[0].url}`
       : undefined,
     offers: {
       "@type": "Offer",
@@ -129,7 +130,7 @@ export default async function Page(props: { params: paramsType }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
       />
 
-      <Navbar navlight={true} tagline={false} />
+      <Navbar navlight={true} />
       {course && courses && (
         <CoursesDetailPage course={course} courses={courses.items} />
       )}

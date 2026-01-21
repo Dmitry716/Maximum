@@ -7,6 +7,7 @@ import "./prosemirror.css";
 
 import { MetadataHead } from "@/components/metadata-head";
 import { Providers } from "@/components/providers";
+import { ScrollIosHtml } from "@/components/scroll-ios-html";
 import { ThemeProvider } from "@/components/theme-provider";
 import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
@@ -32,7 +33,8 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="ru" className="scroll-smooth" dir="ltr">
+    <html lang="ru" dir="ltr">
+      <ScrollIosHtml />
       <head>
         <meta
           name="viewport"
@@ -155,7 +157,7 @@ export default async function RootLayout({
           </div>
         </noscript>
       </head>
-      <body className={` dark:bg-slate-900`}>
+      <body className="dark:bg-slate-900">
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-WF993WJT"
