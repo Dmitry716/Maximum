@@ -47,7 +47,7 @@ export default function CoursesNavigation({
   return (
     <div className="bg-white dark:bg-slate-900 mb-6">
       {/* Categories */}
-      <div className="flex gap-4 flex-wrap">
+      <div className="flex flex-wrap gap-x-4 gap-y-5">
         <div>
           <input
             className="hidden"
