@@ -9,6 +9,7 @@ import { env } from "@/lib/env";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import { Suspense } from "react";
 
 export async function generateMetadata({
   params,
@@ -133,7 +134,9 @@ export default async function Page(props: { params: paramsType }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
       />
 
-      <ScrollIosHtml />
+      <Suspense>
+        <ScrollIosHtml />
+      </Suspense>
       <Navbar navlight={true} />
       {course && courses && (
         <CoursesDetailPage course={course} courses={courses.items} />
