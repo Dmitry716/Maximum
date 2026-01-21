@@ -2,7 +2,7 @@ import {
   getAllAges,
   getAllCoursesPublic,
   getCategories,
-  getCategory as getCategoryByUrl,
+  getCategoryByUrl,
   getSeoSettingsByPageName,
 } from "@/api/requests";
 import Courses from "@/components/courses/courses";
@@ -35,7 +35,6 @@ export async function generateMetadata({
 
   const categroyDescription =
     (category.description || category.name) + " в Витебске";
-  console.log("????", categroyDescription);
   let seoData: SeoSettingType | null = null;
   try {
     seoData = await getSeoSettingsByPageName("courses");

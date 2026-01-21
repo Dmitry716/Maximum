@@ -137,7 +137,7 @@ export async function deleteUser(userId: string) {
   return data as User;
 }
 
-export async function getCategory(categoryUrl: string) {
+export async function getCategoryByUrl(categoryUrl: string) {
   const { data } = await api.get(`/api/categories/${categoryUrl}`);
   return data;
 }

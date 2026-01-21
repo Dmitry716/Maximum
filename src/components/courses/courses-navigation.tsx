@@ -61,7 +61,7 @@ export default function CoursesNavigation({
           />
           <label
             className={clsx(
-              "form-checkbox-label text-lg text-slate-400 " +
+              "form-checkbox-label text-lg text-slate-400 cursor-pointer " +
                 "rounded-full border border-gray-300 px-3 py-2",
               {
                 "bg-violet-50": selectedCategory === "all",
@@ -85,7 +85,7 @@ export default function CoursesNavigation({
               />
               <label
                 className={clsx(
-                  "form-checkbox-label text-lg text-slate-400 " +
+                  "form-checkbox-label text-lg text-slate-400 cursor-pointer " +
                     "rounded-full border border-gray-300 px-3 py-2",
                   {
                     "bg-violet-50": selectedCategory === category.url,
