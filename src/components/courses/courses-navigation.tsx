@@ -8,7 +8,6 @@ export default function CoursesNavigation({
   setSearchParams,
   categories = [],
 }: {
-  ages: string[];
   searchParams: CourseQueryParams;
   setSearchParams: (queryParams: CourseQueryParams) => void;
   categories?: Categories[];

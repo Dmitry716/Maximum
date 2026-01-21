@@ -5,20 +5,11 @@ import { coursesSearchParamsMap } from "@/lib/coursesSearchParams";
 import { Course } from "@/types/type";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryStates } from "nuqs";
-import { useEffect } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import CoursesNavigation from "./courses-navigation";
 import CoursesOne from "./courses-one";
 
-export default function Courses({
-  ctg,
-  categories,
-  ages,
-}: {
-  ctg: string;
-  categories: any;
-  ages: any;
-}) {
+export default function Courses({ categories }: { categories: any }) {
   const [searchParams, setSearchParams] = useQueryStates(
     coursesSearchParamsMap,
     {
@@ -33,22 +24,14 @@ export default function Courses({
     placeholderData: (previousData) => previousData,
   });
 
-  useEffect(() => {
-    const findCtg = categories?.find((item: any) => item.url == ctg)?.url;
-    if (findCtg) {
-      setSearchParams({ categories: [findCtg] });
-    }
-  }, [categories]);
-
   if (isLoading || !courses) return <div>Loading...</div>;
 
   const totalPages = Math.ceil(courses.total / courses.limit);
 
   return (
     <div id="courses-list" className="lg:col-span-8 md:order-1 order-2">
-      {categories && ages && (
+      {categories && (
         <CoursesNavigation
-          ages={ages as string[]}
           searchParams={searchParams}
           setSearchParams={setSearchParams}
           categories={categories}

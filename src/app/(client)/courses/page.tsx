@@ -1,5 +1,4 @@
 import {
-  getAllAges,
   getAllCoursesPublic,
   getCategories,
   getCategoryByUrl,
@@ -110,8 +109,6 @@ export const revalidate = 600;
 
 export default async function CoursesPage({ searchParams }: PageProps) {
   const coursesSearchParams = await loadCoursesSearchParams(searchParams);
-
-  const ages = await getAllAges();
   const categories = await getCategories();
   const allCourses = await getAllCoursesPublic(coursesSearchParams);
 
@@ -182,7 +179,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
 
       <section className="relative py-12">
         <div className="container relative">
-          <Courses ages={ages} categories={categories} ctg="" />
+          <Courses categories={categories} />
         </div>
       </section>
 
