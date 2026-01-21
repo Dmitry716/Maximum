@@ -1,7 +1,7 @@
 "use client";
 
 import { coursesSearchParamsMap } from "@/lib/coursesSearchParams";
-import { Categories, Category } from "@/types/type";
+import { Categories } from "@/types/type";
 import { useQueryStates } from "nuqs";
 import { FunctionComponent } from "react";
 
@@ -16,15 +16,17 @@ const CoursesHeader: FunctionComponent<CoursesHeaderProps> = (params) => {
   });
   const selectedCategories = coursesSearchParams.categories.map(
     (catUrl: string) => categories.find((cat) => cat.url === catUrl),
-  );
-  const selectedCategoriesDescriptions = selectedCategories.map(
-    (cat: Category) => cat?.description ?? cat?.name ?? "Кружки и секции",
-  );
+  ) || [{ description: "Кружки и секции" }];
+  const selectedCategory = selectedCategories[0];
+  const selectedCategoryDescription =
+    selectedCategory?.description ??
+    selectedCategory?.name ??
+    "Кружки и секции";
 
   return (
     <div className="lg:col-span-5 md:col-span-4">
       <h1 className="text-2xl md:leading-normal leading-normal font-semibold">
-        {selectedCategoriesDescriptions}
+        {selectedCategoryDescription}
       </h1>
     </div>
   );
