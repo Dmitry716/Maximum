@@ -4,17 +4,18 @@ import {
   getCategories,
   getSeoSettingsByPageName,
 } from "@/api/requests";
-import Courses, { coursesSearchParamsMap } from "@/components/courses/courses";
+import Courses from "@/components/courses/courses";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
+import { loadCoursesSearchParams } from "@/lib/coursesSearchParams";
 import { env } from "@/lib/env";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { createLoader, SearchParams } from "nuqs/server";
+import { SearchParams } from "nuqs/server";
 import { FiChevronRight } from "react-icons/fi";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -63,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description:
         seoData?.metaDescription ||
         `Найдите лучшие курсы для вашего ребенка в Maximum.`,
-      url: `${env.NEXT_PUBLIC_API_URL}/courses`,
+      url: `${env.NEXT_PUBLIC_SITE_URL}/courses`,
       type: "website",
       images: [
         {
@@ -84,7 +85,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [ogImageUrl],
     },
     alternates: {
-      canonical: `${env.NEXT_PUBLIC_API_URL}/courses`,
+      canonical: `${env.NEXT_PUBLIC_SITE_URL}/courses`,
     },
   };
 }
@@ -96,7 +97,6 @@ type PageProps = {
 };
 
 export default async function CoursesPage({ searchParams }: PageProps) {
-  const loadCoursesSearchParams = createLoader(coursesSearchParamsMap);
   const coursesSearchParams = await loadCoursesSearchParams(searchParams);
 
   const ages = await getAllAges();

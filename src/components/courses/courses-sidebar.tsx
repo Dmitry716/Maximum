@@ -1,6 +1,5 @@
 "use client";
 import { Categories, CourseQueryParams } from "@/types/type";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
 
@@ -15,7 +14,6 @@ export default function CoursesSidebar({
   categories?: Categories[];
 }) {
   const { categories: selectedCategories, search } = searchParams;
-  const router = useRouter();
 
   const applyFilters = () => {
     setSearchParams({
@@ -54,7 +52,7 @@ export default function CoursesSidebar({
     }
     setSearchParams({
       categories: newSelectedCategories,
-      page: 1,
+      page: null,
       search: null,
     });
   };
@@ -95,7 +93,7 @@ export default function CoursesSidebar({
                 onChange={(e) => {
                   setSearchParams({
                     categories: ["all"],
-                    page: 1,
+                    page: null,
                     search: null,
                   });
                 }}

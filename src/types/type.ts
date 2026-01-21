@@ -132,7 +132,7 @@ export interface CourseQueryParams {
   level?: string;
   search?: string | null;
   limit?: number;
-  page?: number;
+  page?: number | null;
 }
 
 export type Group = {

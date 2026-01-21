@@ -1,26 +1,14 @@
 "use client";
 
 import { getAllCoursesPublic } from "@/api/requests";
+import { coursesSearchParamsMap } from "@/lib/coursesSearchParams";
 import { Course } from "@/types/type";
 import { useQuery } from "@tanstack/react-query";
-import {
-  parseAsInteger,
-  parseAsNativeArrayOf,
-  parseAsString,
-  ParserMap,
-  useQueryStates,
-} from "nuqs";
+import { useQueryStates } from "nuqs";
 import { useEffect } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import CoursesOne from "./courses-one";
 import CoursesSidebar from "./courses-sidebar";
-
-export const coursesSearchParamsMap: ParserMap = {
-  categories: parseAsNativeArrayOf(parseAsString).withDefault(["all"]),
-  limit: parseAsInteger,
-  search: parseAsString,
-  page: parseAsInteger,
-};
 
 export default function Courses({
   ctg,
@@ -95,7 +83,7 @@ export default function Courses({
                           page: Math.max(+(searchParams.page ?? "1") - 1, 1),
                         });
                       }}
-                      disabled={searchParams.page === 1}
+                      disabled={+(searchParams.page ?? "1") === 1}
                       className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white dark:bg-slate-900 hover:text-white shadow-sm shadow-slate-100 dark:shadow-slate-800 hover:border-violet-600 dark:hover:border-violet-600 hover:bg-violet-600 dark:hover:bg-violet-600 disabled:opacity-30"
                     >
                       <FiChevronLeft
@@ -116,7 +104,7 @@ export default function Courses({
                             });
                           }}
                           className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${
-                            searchParams.page === p
+                            (searchParams.page ?? 1) === p
                               ? "bg-violet-600 text-white"
                               : "text-slate-400 bg-white dark:bg-slate-900 hover:text-white hover:bg-violet-600"
                           }`}
@@ -138,7 +126,7 @@ export default function Courses({
                           ),
                         });
                       }}
-                      disabled={searchParams.page === totalPages}
+                      disabled={+(searchParams.page ?? "1") === totalPages}
                       className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white dark:bg-slate-900 hover:text-white shadow-sm shadow-slate-100 dark:shadow-slate-800 hover:border-violet-600 dark:hover:border-violet-600 hover:bg-violet-600 dark:hover:bg-violet-600 disabled:opacity-30"
                     >
                       <FiChevronRight
