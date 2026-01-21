@@ -83,8 +83,6 @@ export const revalidate = 600;
 
 export type paramsType = Promise<{ id: string }>;
 
-export const dynamic = "force-dynamic";
-
 export default async function Page(props: { params: paramsType }) {
   const { id } = await props.params;
 
