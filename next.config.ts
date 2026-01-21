@@ -9,9 +9,8 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: ["localhost", "maxximum.by", "192.168.0.15"],
+    domains: ["localhost", "maxximum.by"],
   },
-  allowedDevOrigins: ["192.168.0.15"],
   output: "standalone",
 };
 

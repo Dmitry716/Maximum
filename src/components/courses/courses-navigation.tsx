@@ -1,9 +1,9 @@
 "use client";
 import { Categories, CourseQueryParams } from "@/types/type";
+import clsx from "clsx";
 import { useEffect } from "react";
-import { FiSearch } from "react-icons/fi";
 
-export default function CoursesSidebar({
+export default function CoursesNavigation({
   searchParams,
   setSearchParams,
   categories = [],
@@ -58,81 +58,64 @@ export default function CoursesSidebar({
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-slate-900 rounded-md shadow shadow-slate-100 dark:shadow-slate-800 sticky top-20">
-      {/* Search */}
-      <form>
-        <div>
-          <label htmlFor="searchname" className="font-semibold text-xl">
-            Поиск направления
-          </label>
-          <div className="relative mt-2">
-            <FiSearch className="absolute top-[10px] start-3 size-5" />
-            <input
-              onChange={(e) => setSearchParams({ search: e.target.value })}
-              value={search || ""}
-              name="search"
-              id="searchname"
-              type="text"
-              className="w-full py-2 px-3 border border-slate-100 dark:border-slate-800 focus:border-violet-600/30 dark:focus:border-violet-600/30 bg-transparent focus:outline-none rounded-md h-10 ps-10"
-              placeholder="Поиск"
-            />
-          </div>
-        </div>
-      </form>
-
+    <div className="bg-white dark:bg-slate-900 h-12">
       {/* Categories */}
-      <div className="mt-6">
-        <h3 className="font-semibold">Категории</h3>
-        <div className="block">
-          <div className="flex justify-between mt-2">
-            <div className="inline-flex items-center mb-0">
+      <div className="flex gap-4">
+        <div>
+          <input
+            className="hidden"
+            type="checkbox"
+            checked={selectedCategories?.includes("all")}
+            onChange={(e) => {
+              setSearchParams({
+                categories: ["all"],
+                page: null,
+                search: null,
+              });
+            }}
+            id="AllCategories"
+          />
+          <label
+            className={clsx(
+              "form-checkbox-label text-lg text-slate-400 " +
+                "rounded-full border border-gray-300 px-3 py-2",
+              {
+                "bg-violet-50": selectedCategories?.includes("all"),
+              },
+            )}
+            htmlFor="AllCategories"
+          >
+            Все категории
+          </label>
+        </div>
+        {categories &&
+          categories.map((category) => (
+            <div key={category.id}>
               <input
-                className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
+                checked={!!searchParams.categories?.includes(category.url)}
+                className="hidden"
                 type="checkbox"
-                checked={selectedCategories?.includes("all")}
-                onChange={(e) => {
-                  setSearchParams({
-                    categories: ["all"],
-                    page: null,
-                    search: null,
-                  });
-                }}
-                id="AllCategories"
+                onChange={() => toggleCategory(category.url)}
+                value={category.id}
+                id={`category-${category.id}`}
               />
               <label
-                className="form-checkbox-label text-lg text-slate-400"
-                htmlFor="AllCategories"
+                className={clsx(
+                  "form-checkbox-label text-lg text-slate-400 " +
+                    "rounded-full border border-gray-300 px-3 py-2",
+                  {
+                    "bg-violet-50": selectedCategories?.includes(category.url),
+                  },
+                )}
+                htmlFor={`category-${category.id}`}
               >
-                Все категории
-              </label>
-            </div>
-          </div>
-          {categories &&
-            categories.map((category) => (
-              <div key={category.id} className="flex justify-between mt-2">
-                <div className="inline-flex items-center mb-0">
-                  <input
-                    checked={!!searchParams.categories?.includes(category.url)}
-                    className="form-checkbox h-5 w-5 rounded border-gray-200 dark:border-gray-800 text-violet-600 focus:border-violet-300 focus:ring focus:ring-offset-0 focus:ring-violet-200 focus:ring-opacity-50 me-2"
-                    type="checkbox"
-                    onChange={() => toggleCategory(category.url)}
-                    value={category.id}
-                    id={`category-${category.id}`}
-                  />
-                  <label
-                    className="form-checkbox-label text-lg text-slate-400"
-                    htmlFor={`category-${category.id}`}
-                  >
-                    {category.name}
-                  </label>
-                </div>
-
-                <span className="  text-violet-600 text-md  font-semibold rounded-full h-5">
+                {category.name}
+                <span className="text-violet-600 text-md font-semibold rounded-full h-5 ml-2">
                   {category.coursesCount}
                 </span>
-              </div>
-            ))}
-        </div>
+              </label>
+            </div>
+          ))}
       </div>
 
       {/* Price range */}

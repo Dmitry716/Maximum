@@ -7,8 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryStates } from "nuqs";
 import { useEffect } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import CoursesNavigation from "./courses-navigation";
 import CoursesOne from "./courses-one";
-import CoursesSidebar from "./courses-sidebar";
 
 export default function Courses({
   ctg,
@@ -62,87 +62,92 @@ export default function Courses({
   const totalPages = Math.ceil(courses.total / courses.limit);
 
   return (
-    <div className="grid lg:grid-cols-12 md:grid-cols-2 grid-cols-1 gap-6">
-      <div id="courses-list" className="lg:col-span-8 md:order-1 order-2">
-        <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
-          {courses.items.map((item: Course, index: number) => {
-            return <CoursesOne item={item} key={index} />;
-          })}
-        </div>
-
-        {totalPages > 1 && (
-          <div className="grid md:grid-cols-12 grid-cols-1 mt-6">
-            <div className="md:col-span-12 text-center">
-              <nav>
-                <ul className="inline-flex items-center -space-x-px">
-                  {/* Prev */}
-                  <li>
-                    <button
-                      onClick={() => {
-                        setSearchParams({
-                          page: Math.max(+(searchParams.page ?? "1") - 1, 1),
-                        });
-                      }}
-                      disabled={+(searchParams.page ?? "1") === 1}
-                      className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white dark:bg-slate-900 hover:text-white shadow-sm shadow-slate-100 dark:shadow-slate-800 hover:border-violet-600 dark:hover:border-violet-600 hover:bg-violet-600 dark:hover:bg-violet-600 disabled:opacity-30"
-                    >
-                      <FiChevronLeft
-                        className="text-gray-400 text-sm flex-shrink-0 min-w-[0.875rem]"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </li>
-
-                  {/* Page numbers */}
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (p) => (
-                      <li key={p}>
-                        <button
-                          onClick={() => {
-                            setSearchParams({
-                              page: p,
-                            });
-                          }}
-                          className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${
-                            (searchParams.page ?? 1) === p
-                              ? "bg-violet-600 text-white"
-                              : "text-slate-400 bg-white dark:bg-slate-900 hover:text-white hover:bg-violet-600"
-                          }`}
-                        >
-                          {p}
-                        </button>
-                      </li>
-                    ),
-                  )}
-
-                  {/* Next */}
-                  <li>
-                    <button
-                      onClick={() => {
-                        setSearchParams({
-                          page: Math.min(
-                            +(searchParams.page ?? 0) + 1,
-                            totalPages,
-                          ),
-                        });
-                      }}
-                      disabled={+(searchParams.page ?? "1") === totalPages}
-                      className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white dark:bg-slate-900 hover:text-white shadow-sm shadow-slate-100 dark:shadow-slate-800 hover:border-violet-600 dark:hover:border-violet-600 hover:bg-violet-600 dark:hover:bg-violet-600 disabled:opacity-30"
-                    >
-                      <FiChevronRight
-                        className="text-gray-400 text-sm flex-shrink-0 min-w-[0.875rem]"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </div>
-        )}
+    <div id="courses-list" className="lg:col-span-8 md:order-1 order-2">
+      {categories && ages && (
+        <CoursesNavigation
+          ages={ages as string[]}
+          searchParams={searchParams}
+          setSearchParams={setSearchParams}
+          categories={categories}
+        />
+      )}
+      <div className="grid lg:grid-cols-3 grid-cols-1 gap-6">
+        {courses.items.map((item: Course, index: number) => {
+          return <CoursesOne item={item} key={index} />;
+        })}
       </div>
 
-      <div className="lg:col-span-4 md:order-2 order-1">
+      {totalPages > 1 && (
+        <div className="grid md:grid-cols-12 grid-cols-1 mt-6">
+          <div className="md:col-span-12 text-center">
+            <nav>
+              <ul className="inline-flex items-center -space-x-px">
+                {/* Prev */}
+                <li>
+                  <button
+                    onClick={() => {
+                      setSearchParams({
+                        page: Math.max(+(searchParams.page ?? "1") - 1, 1),
+                      });
+                    }}
+                    disabled={+(searchParams.page ?? "1") === 1}
+                    className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white dark:bg-slate-900 hover:text-white shadow-sm shadow-slate-100 dark:shadow-slate-800 hover:border-violet-600 dark:hover:border-violet-600 hover:bg-violet-600 dark:hover:bg-violet-600 disabled:opacity-30"
+                  >
+                    <FiChevronLeft
+                      className="text-gray-400 text-sm flex-shrink-0 min-w-[0.875rem]"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </li>
+
+                {/* Page numbers */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (p) => (
+                    <li key={p}>
+                      <button
+                        onClick={() => {
+                          setSearchParams({
+                            page: p,
+                          });
+                        }}
+                        className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${
+                          (searchParams.page ?? 1) === p
+                            ? "bg-violet-600 text-white"
+                            : "text-slate-400 bg-white dark:bg-slate-900 hover:text-white hover:bg-violet-600"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    </li>
+                  ),
+                )}
+
+                {/* Next */}
+                <li>
+                  <button
+                    onClick={() => {
+                      setSearchParams({
+                        page: Math.min(
+                          +(searchParams.page ?? 0) + 1,
+                          totalPages,
+                        ),
+                      });
+                    }}
+                    disabled={+(searchParams.page ?? "1") === totalPages}
+                    className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white dark:bg-slate-900 hover:text-white shadow-sm shadow-slate-100 dark:shadow-slate-800 hover:border-violet-600 dark:hover:border-violet-600 hover:bg-violet-600 dark:hover:bg-violet-600 disabled:opacity-30"
+                  >
+                    <FiChevronRight
+                      className="text-gray-400 text-sm flex-shrink-0 min-w-[0.875rem]"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      )}
+      {/* <div className="lg:col-span-4 md:order-2 order-1">
         {categories && ages && (
           <CoursesSidebar
             ages={ages as string[]}
@@ -151,7 +156,7 @@ export default function Courses({
             categories={categories}
           />
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
