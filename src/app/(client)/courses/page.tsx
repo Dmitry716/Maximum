@@ -5,6 +5,7 @@ import {
   getSeoSettingsByPageName,
 } from "@/api/requests";
 import Courses from "@/components/courses/courses";
+import CoursesHeader from "@/components/courses/courses-header";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar/navbar";
 import ScrollToTop from "@/components/scroll-to-top";
@@ -152,11 +153,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
       >
         <div className="container relative">
           <div className="grid md:grid-cols-12 grid-cols-1 gap-2 items-center">
-            <div className="lg:col-span-5 md:col-span-4">
-              <h3 className="text-2xl md:leading-normal leading-normal font-semibold">
-                Кружки и секции
-              </h3>
-            </div>
+            <CoursesHeader categories={categories} />
 
             <div className="lg:col-span-7 md:col-span-8 md:text-end">
               <ul className="tracking-[0.5px] mb-0 inline-flex items-center">

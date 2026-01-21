@@ -23,9 +23,7 @@ import {
 
 const isServer = typeof window === "undefined";
 
-export const backendUrl = isServer
-  ? env.API_URL
-  : env.NEXT_PUBLIC_API_URL;
+export const backendUrl = isServer ? env.API_URL : env.NEXT_PUBLIC_API_URL;
 
 export async function login(values: any) {
   const res = await fetch(`${backendUrl}/api/auth/login`, {
@@ -139,12 +137,13 @@ export async function deleteUser(userId: string) {
   return data as User;
 }
 
-export async function createCategory(
-  name: string,
-  status?: boolean,
-  url?: string,
-) {
-  const { data } = await api.post("/api/categories", { name, status, url });
+export async function createCategory(category: Category) {
+  const { data } = await api.post("/api/categories", {
+    name: category.name,
+    status: category.status,
+    url: category.url,
+    description: category.description,
+  });
   return data as Category;
 }
 
@@ -153,6 +152,7 @@ export async function updateCategory(category: Category) {
     name: category.name,
     status: category.status,
     url: category.url,
+    description: category.description,
   });
   return data as Category;
 }

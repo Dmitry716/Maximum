@@ -11,6 +11,7 @@ import {
 export interface Categories {
   id: string;
   name: string;
+  description: string;
   url: string;
   isActive: string;
   coursesCount: number;

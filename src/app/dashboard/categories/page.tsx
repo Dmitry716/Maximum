@@ -1,11 +1,14 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { CrudLayout } from "@/components/crud/crud-layout"
-import { DataTable } from "@/components/crud/data-table"
-import type { ColumnDef } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
-import { Pencil, Trash2 } from "lucide-react"
+import {
+  createCategory,
+  deleteCategory,
+  getCategoriesAdmin,
+  updateCategory,
+} from "@/api/requests";
+import { CrudLayout } from "@/components/crud/crud-layout";
+import { DataTable } from "@/components/crud/data-table";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,88 +16,104 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { createCategory, deleteCategory, getCategories, getCategoriesAdmin, updateCategory } from "@/api/requests"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Category } from "@/types/type"
-import { useAuth } from "@/hooks/auth-context"
-import { UserRole } from "@/types/enum"
-import { toast } from "sonner"
-import slugify from 'slugify'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAuth } from "@/hooks/auth-context";
+import { UserRole } from "@/types/enum";
+import { Category } from "@/types/type";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import slugify from "slugify";
+import { toast } from "sonner";
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[] | null>([])
-  const [isDialogDeleteOpen, setIsDialogDeleteOpen] = useState(false)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [currentCategory, setCurrentCategory] = useState<Partial<Category>>({})
-  const [isEditing, setIsEditing] = useState(false)
-  const queryClient = useQueryClient()
-  const { user } = useAuth()
+  const [categories, setCategories] = useState<Category[] | null>([]);
+  const [isDialogDeleteOpen, setIsDialogDeleteOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentCategory, setCurrentCategory] = useState<Partial<Category>>({});
+  const [isEditing, setIsEditing] = useState(false);
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
 
-  if (!user?.role) return null
+  if (!user?.role) return null;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['categoriesAdmin'],
+    queryKey: ["categoriesAdmin"],
     queryFn: getCategoriesAdmin,
     staleTime: 1000 * 60 * 5,
     retry: 3,
-  })
+  });
 
-  const {
-    mutate: createOrUpdateCategory,
-    isPending
-  } = useMutation({
+  const { mutate: createOrUpdateCategory, isPending } = useMutation({
     mutationFn: async () => {
       // @ts-ignore
-      const ctgSlug = slugify(currentCategory.name, { lower: true })
+      const ctgSlug = slugify(currentCategory.name, { lower: true });
       if (isEditing) {
-        return await updateCategory({ ...currentCategory, url: ctgSlug } as Category);
+        return await updateCategory({
+          ...currentCategory,
+          url: ctgSlug,
+        } as Category);
       } else {
-        return await createCategory(currentCategory.name as string, currentCategory?.status as any, ctgSlug);
+        return await createCategory({
+          ...currentCategory,
+          url: ctgSlug,
+        } as Category);
       }
     },
     onSuccess: (result) => {
       if (isEditing) {
-        setCategories((prev) =>
-          prev?.map((c) =>
-            c.id === result.id ? ({ ...c, ...result } as Category) : c,
-          ) || [],
+        setCategories(
+          (prev) =>
+            prev?.map((c) =>
+              c.id === result.id ? ({ ...c, ...result } as Category) : c,
+            ) || [],
         );
-        setCurrentCategory({})
+        setCurrentCategory({});
       } else {
-        setCurrentCategory({})
-        setCategories((prev: any) => [...(prev || []), { ...result, studentCount: 0, coursesCount: 0 }]);
+        setCurrentCategory({});
+        setCategories((prev: any) => [
+          ...(prev || []),
+          { ...result, studentCount: 0, coursesCount: 0 },
+        ]);
       }
-      queryClient.invalidateQueries({ queryKey: ['categoriesAdmin'] })
-      setIsDialogOpen(false)
-      setIsEditing(false)
+      queryClient.invalidateQueries({ queryKey: ["categoriesAdmin"] });
+      setIsDialogOpen(false);
+      setIsEditing(false);
     },
     onError: (error) => {
       console.log("Xatolik:", error);
     },
   });
 
-  const {
-    mutate: deleteCategoryMutation,
-    isPending: isPendingDelete
-  } = useMutation({
-    mutationFn: async (id: string) => {
-      return await deleteCategory(id as string);
-    },
-    onSuccess: () => {
-      setCategories((prev) => prev && prev?.filter((c) => c.id !== currentCategory.id))
-      setCurrentCategory({})
-      toast.success("Категория удалена успешно")
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
-      setIsDialogDeleteOpen(false)
-    },
-    onError: (error) => {
-      console.log("Xatolik:", error);
-    },
-  });
+  const { mutate: deleteCategoryMutation, isPending: isPendingDelete } =
+    useMutation({
+      mutationFn: async (id: string) => {
+        return await deleteCategory(id as string);
+      },
+      onSuccess: () => {
+        setCategories(
+          (prev) => prev && prev?.filter((c) => c.id !== currentCategory.id),
+        );
+        setCurrentCategory({});
+        toast.success("Категория удалена успешно");
+        queryClient.invalidateQueries({ queryKey: ["categories"] });
+        setIsDialogDeleteOpen(false);
+      },
+      onError: (error) => {
+        console.log("Xatolik:", error);
+      },
+    });
 
   useEffect(() => {
     if (data) {
@@ -123,7 +142,7 @@ export default function CategoriesPage() {
       id: "actions",
       header: "Действия",
       cell: ({ row }) => {
-        const category = row.original
+        const category = row.original;
         return (
           <div className="flex gap-2 items-center justify-center">
             <Button
@@ -137,23 +156,23 @@ export default function CategoriesPage() {
               variant="ghost"
               size="icon"
               onClick={() => {
-                setIsDialogDeleteOpen(true)
+                setIsDialogDeleteOpen(true);
                 setCurrentCategory({
                   id: category.id,
                   name: category.name,
                   status: category.status,
-                })
+                });
               }}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
-        )
+        );
       },
       enableSorting: false,
       enableColumnFilter: false,
     },
-  ]
+  ];
 
   const columnsUser: ColumnDef<Category>[] = [
     {
@@ -171,37 +190,54 @@ export default function CategoriesPage() {
     {
       accessorKey: "status",
       header: "Статус",
-    }
-  ]
+    },
+  ];
 
   const handleEdit = (category: Category) => {
-    setCurrentCategory(category)
-    setIsEditing(true)
-    setIsDialogOpen(true)
-  }
+    setCurrentCategory(category);
+    setIsEditing(true);
+    setIsDialogOpen(true);
+  };
 
   return (
     <CrudLayout
       title="Категории"
       description="Управление категориями курсов вашего образовательного центра"
       createButtonLabel="Создать категорию"
-      isButton={user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN}
+      isButton={
+        user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN
+      }
       onCreateClick={() => {
-        setCurrentCategory({})
-        setIsEditing(false)
-        setIsDialogOpen(true)
+        setCurrentCategory({});
+        setIsEditing(false);
+        setIsDialogOpen(true);
       }}
     >
-      {isLoading
-        ? <div>Loading...</div>
-        : <DataTable columns={user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN ? columns : columnsUser} data={categories} searchKey="name" />
-      }
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <DataTable
+          columns={
+            user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN
+              ? columns
+              : columnsUser
+          }
+          data={categories}
+          searchKey="name"
+        />
+      )}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Редактировать категорию" : "Создать новую категорию"}</DialogTitle>
+            <DialogTitle>
+              {isEditing
+                ? "Редактировать категорию"
+                : "Создать новую категорию"}
+            </DialogTitle>
             <DialogDescription>
-              {isEditing ? "Измените информацию о категории здесь." : "Заполните информацию о новой категории здесь."}
+              {isEditing
+                ? "Измените информацию о категории здесь."
+                : "Заполните информацию о новой категории здесь."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -212,7 +248,28 @@ export default function CategoriesPage() {
               <Input
                 id="name"
                 value={currentCategory.name || ""}
-                onChange={(e) => setCurrentCategory({ ...currentCategory, name: e.target.value })}
+                onChange={(e) =>
+                  setCurrentCategory({
+                    ...currentCategory,
+                    name: e.target.value,
+                  })
+                }
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Описание
+              </Label>
+              <Input
+                id="description"
+                value={currentCategory.description || ""}
+                onChange={(e) =>
+                  setCurrentCategory({
+                    ...currentCategory,
+                    description: e.target.value,
+                  })
+                }
                 className="col-span-3"
               />
             </div>
@@ -223,7 +280,10 @@ export default function CategoriesPage() {
               <Select
                 value={currentCategory.status}
                 onValueChange={(value) =>
-                  setCurrentCategory((prev) => ({ ...prev, status: value as any }))
+                  setCurrentCategory((prev) => ({
+                    ...prev,
+                    status: value as any,
+                  }))
                 }
               >
                 <SelectTrigger>
@@ -239,7 +299,16 @@ export default function CategoriesPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button disabled={isPending} onClick={() => createOrUpdateCategory()}>{isEditing ? "Сохранить изменения" : isPending ? "Создание..." : "Создать категорию"}</Button>
+            <Button
+              disabled={isPending}
+              onClick={() => createOrUpdateCategory()}
+            >
+              {isEditing
+                ? "Сохранить изменения"
+                : isPending
+                  ? "Создание..."
+                  : "Создать категорию"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -255,19 +324,24 @@ export default function CategoriesPage() {
             <Button
               className=" hover:bg-red-600"
               disabled={isPendingDelete}
-              onClick={() => deleteCategoryMutation(currentCategory.id as string)}>
+              onClick={() =>
+                deleteCategoryMutation(currentCategory.id as string)
+              }
+            >
               {isPendingDelete ? "Удаление..." : "Удалить категорию"}
             </Button>
-            <Button disabled={isPending} onClick={() => {
-              setIsDialogDeleteOpen(false)
-              setCurrentCategory({})
-            }}>
+            <Button
+              disabled={isPending}
+              onClick={() => {
+                setIsDialogDeleteOpen(false);
+                setCurrentCategory({});
+              }}
+            >
               Закрыть
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </CrudLayout>
-  )
+  );
 }
-

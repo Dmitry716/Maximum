@@ -147,16 +147,6 @@ export default function Courses({
           </div>
         </div>
       )}
-      {/* <div className="lg:col-span-4 md:order-2 order-1">
-        {categories && ages && (
-          <CoursesSidebar
-            ages={ages as string[]}
-            searchParams={searchParams}
-            setSearchParams={setSearchParams}
-            categories={categories}
-          />
-        )}
-      </div> */}
     </div>
   );
 }

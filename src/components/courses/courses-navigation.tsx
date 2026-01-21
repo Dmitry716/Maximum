@@ -31,24 +31,12 @@ export default function CoursesNavigation({
   }, [search, selectedCategories]);
 
   const toggleCategory = (url: string) => {
-    let oldSelectedCategories: string[] = selectedCategories || [];
-    const includesId = oldSelectedCategories.includes(url);
+    const includesId = selectedCategories?.includes(url);
     let newSelectedCategories: string[] | undefined = [];
     if (includesId) {
-      newSelectedCategories = oldSelectedCategories?.filter(
-        (catUrl) => catUrl !== url,
-      );
-    } else {
-      oldSelectedCategories = oldSelectedCategories.filter(
-        (catUrl) => catUrl !== "all",
-      );
-      newSelectedCategories = [...oldSelectedCategories, url];
-    }
-    if (
-      newSelectedCategories.length === 0 ||
-      newSelectedCategories.length === categories.length
-    ) {
       newSelectedCategories = ["all"];
+    } else {
+      newSelectedCategories = [url];
     }
     setSearchParams({
       categories: newSelectedCategories,
