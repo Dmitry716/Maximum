@@ -11,9 +11,7 @@ interface CoursesHeaderProps {
 
 const CoursesHeader: FunctionComponent<CoursesHeaderProps> = (params) => {
   const { categories } = params;
-  const [coursesSearchParams] = useQueryStates(coursesSearchParamsMap, {
-    scroll: true,
-  });
+  const [coursesSearchParams] = useQueryStates(coursesSearchParamsMap);
   const selectedCategories = coursesSearchParams.categories.map(
     (catUrl: string) => categories.find((cat) => cat.url === catUrl),
   ) || [{ description: "Кружки и секции" }];
