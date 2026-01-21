@@ -41,7 +41,6 @@ export default function CoursesNavigation({
     setSearchParams({
       categories: newSelectedCategories,
       page: null,
-      search: null,
     });
   };
 
@@ -58,7 +57,6 @@ export default function CoursesNavigation({
               setSearchParams({
                 categories: ["all"],
                 page: null,
-                search: null,
               });
             }}
             id="AllCategories"

@@ -2,6 +2,7 @@ import { getAllCoursesPublic, getCourseByName } from "@/api/requests";
 import CoursesDetailPage from "@/components/courses/courses-detail";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar/navbar";
+import { ScrollIosHtml } from "@/components/scroll-ios-html";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { env } from "@/lib/env";
@@ -81,6 +82,8 @@ export const revalidate = 600;
 
 export type paramsType = Promise<{ id: string }>;
 
+export const dynamic = "force-dynamic";
+
 export default async function Page(props: { params: paramsType }) {
   const { id } = await props.params;
 
@@ -130,6 +133,7 @@ export default async function Page(props: { params: paramsType }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
       />
 
+      <ScrollIosHtml />
       <Navbar navlight={true} />
       {course && courses && (
         <CoursesDetailPage course={course} courses={courses.items} />

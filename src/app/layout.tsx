@@ -7,7 +7,6 @@ import "./prosemirror.css";
 
 import { MetadataHead } from "@/components/metadata-head";
 import { Providers } from "@/components/providers";
-import { ScrollIosHtml } from "@/components/scroll-ios-html";
 import { ThemeProvider } from "@/components/theme-provider";
 import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
@@ -34,7 +33,6 @@ export default async function RootLayout({
 
   return (
     <html lang="ru" dir="ltr">
-      <ScrollIosHtml />
       <head>
         <meta
           name="viewport"
