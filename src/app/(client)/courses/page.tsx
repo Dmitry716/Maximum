@@ -2,6 +2,7 @@ import {
   getAllAges,
   getAllCoursesPublic,
   getCategories,
+  getCategory as getCategoryByUrl,
   getSeoSettingsByPageName,
 } from "@/api/requests";
 import Courses from "@/components/courses/courses";
@@ -12,14 +13,29 @@ import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { loadCoursesSearchParams } from "@/lib/coursesSearchParams";
 import { env } from "@/lib/env";
-import { SeoSetting as SeoSettingType } from "@/types/type";
+import { Categories, SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import { SearchParams } from "nuqs/server";
 import { FiChevronRight } from "react-icons/fi";
 
-export async function generateMetadata(): Promise<Metadata> {
+type PageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const coursesSearchParams = await loadCoursesSearchParams(searchParams);
+  let category: Categories = { name: "Кружки и секции" } as Categories;
+  if (coursesSearchParams.category !== "all") {
+    category = await getCategoryByUrl(coursesSearchParams.category);
+  }
+
+  const categroyDescription =
+    (category.description || category.name) + " в Витебске";
+  console.log("????", categroyDescription);
   let seoData: SeoSettingType | null = null;
   try {
     seoData = await getSeoSettingsByPageName("courses");
@@ -30,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
     );
   }
 
-  const title = seoData?.metaTitle || `Курсы | Maximum`;
+  const title = categroyDescription || seoData?.metaTitle || `Курсы | Maximum`;
   const description =
     seoData?.metaDescription ||
     `Найдите лучшие курсы для вашего ребенка в Maximum. Качественное образование и развитие навыков.`;
@@ -92,10 +108,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const revalidate = 600;
-
-type PageProps = {
-  searchParams: Promise<SearchParams>;
-};
 
 export default async function CoursesPage({ searchParams }: PageProps) {
   const coursesSearchParams = await loadCoursesSearchParams(searchParams);

@@ -27,24 +27,7 @@ export default function Courses({
   );
   const { data: courses, isLoading } = useQuery({
     queryKey: ["courses", searchParams],
-    queryFn: () => {
-      let mappedCategories = [];
-      if (searchParams.categories.includes("all")) {
-        mappedCategories = [];
-      } else {
-        mappedCategories = searchParams.categories.map(
-          (catUrl: string) =>
-            categories.find(
-              (cat: { url: string; id: number }) => cat.url === catUrl,
-            ).id,
-        );
-      }
-      const search = {
-        ...searchParams,
-        categories: mappedCategories,
-      };
-      return getAllCoursesPublic(search);
-    },
+    queryFn: () => getAllCoursesPublic(searchParams),
     staleTime: 1000 * 60 * 5,
     retry: 3,
     placeholderData: (previousData) => previousData,

@@ -137,6 +137,11 @@ export async function deleteUser(userId: string) {
   return data as User;
 }
 
+export async function getCategory(categoryUrl: string) {
+  const { data } = await api.get(`/api/categories/${categoryUrl}`);
+  return data;
+}
+
 export async function createCategory(category: Category) {
   const { data } = await api.post("/api/categories", {
     name: category.name,
@@ -171,8 +176,8 @@ export async function getAllCoursesPublic(
   filters: CourseQueryParams = {},
 ): Promise<PaginatedCourses> {
   const params: Record<string, any> = {};
-  if (filters.categories && filters.categories.length > 0) {
-    params.categories = filters.categories.join(",");
+  if (filters.category !== undefined) {
+    params.category = filters.category;
   }
 
   if (filters.minPrice !== undefined) {

@@ -12,10 +12,9 @@ interface CoursesHeaderProps {
 const CoursesHeader: FunctionComponent<CoursesHeaderProps> = (params) => {
   const { categories } = params;
   const [coursesSearchParams] = useQueryStates(coursesSearchParamsMap);
-  const selectedCategories = coursesSearchParams.categories.map(
-    (catUrl: string) => categories.find((cat) => cat.url === catUrl),
-  ) || [{ description: "Кружки и секции" }];
-  const selectedCategory = selectedCategories[0];
+  const selectedCategory = categories.find(
+    (cat) => cat.url === coursesSearchParams.category,
+  ) || { name: "Кружки и секции", description: "Кружки и секции" };
   const selectedCategoryDescription =
     selectedCategory?.description ??
     selectedCategory?.name ??

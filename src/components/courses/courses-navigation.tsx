@@ -13,12 +13,11 @@ export default function CoursesNavigation({
   setSearchParams: (queryParams: CourseQueryParams) => void;
   categories?: Categories[];
 }) {
-  const { categories: selectedCategories, search } = searchParams;
+  const { category: selectedCategory } = searchParams;
 
   const applyFilters = () => {
     setSearchParams({
-      search,
-      categories: selectedCategories,
+      category: selectedCategory,
     });
   };
 
@@ -28,18 +27,17 @@ export default function CoursesNavigation({
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [search, selectedCategories]);
+  }, [selectedCategory]);
 
   const toggleCategory = (url: string) => {
-    const includesId = selectedCategories?.includes(url);
-    let newSelectedCategories: string[] | undefined = [];
-    if (includesId) {
-      newSelectedCategories = ["all"];
+    let newCategory: string | undefined;
+    if (selectedCategory === url) {
+      newCategory = "all";
     } else {
-      newSelectedCategories = [url];
+      newCategory = url;
     }
     setSearchParams({
-      categories: newSelectedCategories,
+      category: newCategory,
       page: null,
     });
   };
@@ -52,10 +50,10 @@ export default function CoursesNavigation({
           <input
             className="hidden"
             type="checkbox"
-            checked={selectedCategories?.includes("all")}
+            checked={selectedCategory === "all"}
             onChange={(e) => {
               setSearchParams({
-                categories: ["all"],
+                category: "all",
                 page: null,
               });
             }}
@@ -66,7 +64,7 @@ export default function CoursesNavigation({
               "form-checkbox-label text-lg text-slate-400 " +
                 "rounded-full border border-gray-300 px-3 py-2",
               {
-                "bg-violet-50": selectedCategories?.includes("all"),
+                "bg-violet-50": selectedCategory === "all",
               },
             )}
             htmlFor="AllCategories"
@@ -78,7 +76,7 @@ export default function CoursesNavigation({
           categories.map((category) => (
             <div key={category.id}>
               <input
-                checked={!!searchParams.categories?.includes(category.url)}
+                checked={searchParams.category === category.url}
                 className="hidden"
                 type="checkbox"
                 onChange={() => toggleCategory(category.url)}
@@ -90,7 +88,7 @@ export default function CoursesNavigation({
                   "form-checkbox-label text-lg text-slate-400 " +
                     "rounded-full border border-gray-300 px-3 py-2",
                   {
-                    "bg-violet-50": selectedCategories?.includes(category.url),
+                    "bg-violet-50": selectedCategory === category.url,
                   },
                 )}
                 htmlFor={`category-${category.id}`}
