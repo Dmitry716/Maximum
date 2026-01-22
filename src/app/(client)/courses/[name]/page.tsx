@@ -6,6 +6,7 @@ import { ScrollIosHtml } from "@/components/scroll-ios-html";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { env } from "@/lib/env";
+import { QueryClient } from "@tanstack/react-query";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
@@ -16,7 +17,7 @@ export async function generateMetadata({
 }: {
   params: paramsType;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { name: id } = await params;
   if (!id) return {};
   const course = await getCourseByName(id);
 
@@ -81,21 +82,22 @@ export async function generateStaticParams() {
 
 export const revalidate = 600;
 
-export type paramsType = Promise<{ id: string }>;
+export type paramsType = Promise<{ name: string }>;
 
 export default async function Page(props: { params: paramsType }) {
-  const { id } = await props.params;
+  const { name } = await props.params;
 
-  let course = null;
-  try {
-    course = await getCourseByName(id);
-  } catch (error: any) {
-    if (error.response?.status === 404) return notFound();
-    throw error;
+  const queryClient = new QueryClient();
+
+  const courses = await queryClient.fetchQuery({
+    queryKey: ["courses"],
+    queryFn: () => getAllCoursesPublic(),
+  });
+
+  const course = courses.items.find(({ url }) => url === name);
+  if (course === undefined) {
+    return notFound();
   }
-
-  const courses = await getAllCoursesPublic();
-
   // JSON-LD для отдельного курса
   const courseSchema = {
     "@context": "https://schema.org",
