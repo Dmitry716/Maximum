@@ -13,6 +13,11 @@ import Switcher from "@/components/switcher";
 import { loadCoursesSearchParams } from "@/lib/coursesSearchParams";
 import { env } from "@/lib/env";
 import { Categories, SeoSetting as SeoSettingType } from "@/types/type";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
@@ -109,8 +114,20 @@ export const revalidate = 600;
 
 export default async function CoursesPage({ searchParams }: PageProps) {
   const coursesSearchParams = await loadCoursesSearchParams(searchParams);
-  const categories = await getCategories();
-  const allCourses = await getAllCoursesPublic(coursesSearchParams);
+  const queryClient = new QueryClient();
+
+  const coursesPromise = queryClient.fetchQuery({
+    queryKey: ["courses", coursesSearchParams],
+    queryFn: () => getAllCoursesPublic(coursesSearchParams),
+  });
+  const categoriesPromise = queryClient.fetchQuery({
+    queryKey: ["categories"],
+    queryFn: () => getCategories(),
+  });
+  const [courses, categories] = await Promise.all([
+    coursesPromise,
+    categoriesPromise,
+  ]);
 
   // JSON-LD для страницы "все курсы"
   const collectionSchema = {
@@ -122,7 +139,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
     url: `${env.NEXT_PUBLIC_SITE_URL}/courses`,
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: allCourses.items.map((course, index) => ({
+      itemListElement: courses.items.map((course, index) => ({
         "@type": "ListItem",
         position: index + 1,
         item: {
@@ -177,11 +194,13 @@ export default async function CoursesPage({ searchParams }: PageProps) {
         </div>
       </section>
 
-      <section className="relative py-12">
-        <div className="container relative">
-          <Courses categories={categories} />
-        </div>
-      </section>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <section className="relative py-12">
+          <div className="container relative">
+            <Courses categories={categories} />
+          </div>
+        </section>
+      </HydrationBoundary>
 
       <Footer />
       <ScrollToTop />

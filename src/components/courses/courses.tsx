@@ -3,28 +3,32 @@
 import { getAllCoursesPublic } from "@/api/requests";
 import { coursesSearchParamsMap } from "@/lib/coursesSearchParams";
 import { Course } from "@/types/type";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useQueryStates } from "nuqs";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import CoursesNavigation from "./courses-navigation";
 import CoursesOne from "./courses-one";
 
-export default function Courses({ categories }: { categories: any }) {
+type CoursesProps = {
+  categories: any;
+};
+
+export default function Courses(params: CoursesProps) {
+  const { categories } = params;
+
   const [searchParams, setSearchParams] = useQueryStates(
     coursesSearchParamsMap,
     {
       scroll: true,
     },
   );
-  const { data: courses, isLoading } = useQuery({
+
+  const { data: courses } = useSuspenseQuery({
     queryKey: ["courses", searchParams],
     queryFn: () => getAllCoursesPublic(searchParams),
     staleTime: 1000 * 60 * 5,
     retry: 3,
-    placeholderData: (previousData) => previousData,
   });
-
-  if (isLoading || !courses) return <div>Loading...</div>;
 
   const totalPages = Math.ceil(courses.total / courses.limit);
 
