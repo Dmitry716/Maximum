@@ -60,18 +60,19 @@ export async function generateMetadata({
 
 export async function generateStaticParams() {
   try {
-    const courses = await getAllCoursesPublic({ limit: 1000, page: 1 });
+    const courses = await getAllCoursesPublic();
 
     return courses.items
       .filter(
         (course) =>
+          course.url &&
           course.category &&
           typeof course.category !== "string" &&
           course.category.url &&
           course.category.url !== "courses",
       )
       .map((course) => ({
-        id: course.url,
+        name: course.url,
         courses: (course.category as any)?.url,
       }));
   } catch (error) {
