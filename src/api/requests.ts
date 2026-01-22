@@ -196,8 +196,8 @@ export async function getAllCoursesPublic(
     params.search = filters.search;
   }
 
-  params.limit = filters.limit ?? 10;
-  params.page = filters.page ?? 1;
+  params.limit = filters.limit;
+  params.page = filters.page;
 
   const { data } = await api.get<PaginatedCourses>("/api/courses", {
     params,

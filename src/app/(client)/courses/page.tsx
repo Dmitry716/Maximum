@@ -8,10 +8,11 @@ import Courses from "@/components/courses/courses";
 import CoursesHeader from "@/components/courses/courses-header";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar/navbar";
+import Pagination from "@/components/pagination";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
-import { loadCoursesSearchParams } from "@/lib/coursesSearchParams";
 import { env } from "@/lib/env";
+import { loadCoursesSearchParams } from "@/lib/search-params";
 import { Categories, SeoSetting as SeoSettingType } from "@/types/type";
 import {
   dehydrate,
@@ -198,6 +199,11 @@ export default async function CoursesPage({ searchParams }: PageProps) {
         <section className="relative py-12">
           <div className="container relative">
             <Courses categories={categories} />
+            <Pagination
+              pathname="/courses"
+              searchParams={searchParams}
+              totalCount={courses.total}
+            />
           </div>
         </section>
       </HydrationBoundary>

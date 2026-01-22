@@ -2,17 +2,18 @@ import { getBlogs, getSeoSettingsByPageName } from "@/api/requests";
 import Blog from "@/components/blog";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar/navbar";
+import Pagination from "@/components/pagination";
 import ScrollToTop from "@/components/scroll-to-top";
 import Switcher from "@/components/switcher";
 import { env } from "@/lib/env";
+import { loadPaginationSearchParams } from "@/lib/search-params";
 import { SeoSetting as SeoSettingType } from "@/types/type";
 import { Metadata } from "next";
-import Link from "next/link";
 import Script from "next/script";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { SearchParams } from "nuqs/server";
 
 type Props = {
-  searchParams: Promise<{ [key: string]: string | string | undefined }>;
+  searchParams: Promise<SearchParams>;
 };
 
 export const revalidate = 600;
@@ -101,18 +102,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BlogsPage({ searchParams }: Props) {
-  const { page } = await searchParams;
+  const { page, limit } = await loadPaginationSearchParams(searchParams);
 
-  const currentPage = parseInt(page || "1");
-
-  const limit = 2;
   const status = "published";
 
-  const result = await getBlogs(currentPage, limit, status);
+  const result = await getBlogs(page, limit, status);
 
   const blogs = result.items;
   const totalCount = result.total;
-  const totalPages = Math.ceil(totalCount / limit);
 
   // JSON-LD для списка блогов
   const collectionSchema = {
@@ -187,75 +184,11 @@ export default async function BlogsPage({ searchParams }: Props) {
           {/* Blogs */}
           <Blog isBlog={true} link={`/blog/`} blogs={blogs} />
 
-          {/* Pagination */}
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-12 grid-cols-1 mt-6">
-              <div className="md:col-span-12 text-center">
-                <nav>
-                  <ul className="inline-flex items-center -space-x-px">
-                    <li>
-                      {currentPage > 1 ? (
-                        <Link
-                          href={`/blogs?page=${currentPage - 1}#blogs`}
-                          className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white hover:text-white shadow-sm hover:bg-violet-600"
-                        >
-                          <FiChevronLeft
-                            className="text-gray-400 text-sm flex-shrink-0 min-w-[0.875rem]"
-                            aria-hidden="true"
-                          />
-                        </Link>
-                      ) : (
-                        <span className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-gray-300 bg-gray-100 cursor-not-allowed">
-                          <FiChevronLeft
-                            className="text-gray-400 text-sm flex-shrink-0 min-w-[0.875rem]"
-                            aria-hidden="true"
-                          />
-                        </span>
-                      )}
-                    </li>
-                    {/* Sahifa raqamlari */}
-                    {Array.from({ length: totalPages }).map((_, idx) => {
-                      const pageNum = idx + 1;
-                      return (
-                        <li key={pageNum}>
-                          <Link
-                            href={`/blog?page=${pageNum}#blogs`}
-                            className={`size-8 inline-flex justify-center items-center mx-1 rounded-full ${
-                              pageNum === currentPage
-                                ? "bg-violet-600 text-white"
-                                : "bg-white text-slate-400 hover:bg-violet-600 hover:text-white shadow-sm"
-                            }`}
-                          >
-                            {pageNum}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                    <li>
-                      {currentPage < totalPages ? (
-                        <Link
-                          href={`/blog?page=${currentPage + 1}`}
-                          className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-slate-400 bg-white hover:text-white shadow-sm hover:bg-violet-600"
-                        >
-                          <FiChevronRight
-                            className="text-gray-400 text-sm flex-shrink-0 min-w-[0.875rem]"
-                            aria-hidden="true"
-                          />
-                        </Link>
-                      ) : (
-                        <span className="size-8 inline-flex justify-center items-center mx-1 rounded-full text-gray-300 bg-gray-100 cursor-not-allowed">
-                          <FiChevronRight
-                            className="text-gray-400 text-sm flex-shrink-0 min-w-[0.875rem]"
-                            aria-hidden="true"
-                          />
-                        </span>
-                      )}
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            </div>
-          </div>
+          <Pagination
+            pathname="/blog"
+            totalCount={totalCount}
+            searchParams={searchParams}
+          />
         </div>
       </section>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { coursesSearchParamsMap } from "@/lib/coursesSearchParams";
+import { coursesSearchParamsParserMap } from "@/lib/search-params";
 import { Categories } from "@/types/type";
 import { useQueryStates } from "nuqs";
 import { FunctionComponent } from "react";
@@ -11,7 +11,7 @@ interface CoursesHeaderProps {
 
 const CoursesHeader: FunctionComponent<CoursesHeaderProps> = (params) => {
   const { categories } = params;
-  const [coursesSearchParams] = useQueryStates(coursesSearchParamsMap);
+  const [coursesSearchParams] = useQueryStates(coursesSearchParamsParserMap);
   const selectedCategory = categories.find(
     (cat) => cat.url === coursesSearchParams.category,
   ) || { name: "Кружки и секции", description: "Кружки и секции" };

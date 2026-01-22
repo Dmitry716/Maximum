@@ -90,7 +90,7 @@ export default async function Page(props: { params: paramsType }) {
   const queryClient = new QueryClient();
 
   const courses = await queryClient.fetchQuery({
-    queryKey: ["courses"],
+    queryKey: ["courses", name],
     queryFn: () => getAllCoursesPublic(),
   });
 
