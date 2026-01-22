@@ -89,15 +89,31 @@ export default async function Page(props: { params: paramsType }) {
 
   const queryClient = new QueryClient();
 
-  const courses = await queryClient.fetchQuery({
-    queryKey: ["courses", name],
-    queryFn: () => getAllCoursesPublic(),
-  });
+  const [coursesResult, courseResult] = await Promise.allSettled([
+    queryClient.fetchQuery({
+      queryKey: ["courses", name],
+      queryFn: () => getAllCoursesPublic({ limit: 4 }),
+    }),
+    queryClient.fetchQuery({
+      queryKey: ["course", name],
+      queryFn: () => getCourseByName(name),
+    }),
+  ]);
 
-  const course = courses.items.find(({ url }) => url === name);
-  if (course === undefined) {
+  let course = null;
+  if (courseResult.status === "fulfilled") {
+    course = courseResult.value;
+  } else {
+    if (courseResult.reason.status === 404) {
+      return notFound();
+    }
+    // в остальных случаях тоже 404, чтобы не ломать сервер
     return notFound();
   }
+
+  const courses =
+    coursesResult.status === "fulfilled" ? coursesResult.value : { items: [] };
+
   // JSON-LD для отдельного курса
   const courseSchema = {
     "@context": "https://schema.org",
