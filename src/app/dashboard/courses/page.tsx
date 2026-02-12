@@ -1,11 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { CrudLayout } from "@/components/crud/crud-layout"
 import { DataTable } from "@/components/crud/data-table"
-import type { ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
-import { Pencil, Trash2, Calendar } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -16,30 +13,33 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type { ColumnDef } from "@tanstack/react-table"
+import { Calendar, Pencil, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
 
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import Image from "next/image"
-import { Card } from "@/components/ui/card"
 import { createCourse, createGroup, deleteCourse, deleteGroup, getAllCourses, getAllCoursesByInstructor, getCategories, getUsers, updateCourse, updateGroup, uploadFile } from "@/api/requests"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { z } from "zod"
-import { Controller, useFieldArray, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { CourseStatus, DayOfWeek, UserRole } from "@/types/enum"
-import { Course, Group, User } from "@/types/type"
-import { toast } from "sonner"
+import { ScheduleGroup } from "@/components/schedule-group"
+import TailwindAdvancedEditor from "@/components/tailwind/advanced-editor"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Card } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useAuth } from "@/hooks/auth-context"
-import slugify from 'slugify'
+import { env } from "@/lib/env"
 import { courseFormSchema, groupFormSchema } from "@/lib/validations"
-import { Switch } from "@/components/ui/switch"
 import { dayOfWeekLabels } from "@/types/constants"
-import { ScheduleGroup } from "@/components/schedule-group"
+import { CourseStatus, DayOfWeek, UserRole } from "@/types/enum"
+import { Course, Group, User } from "@/types/type"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import Image from "next/image"
 import Link from "next/link"
-import TailwindAdvancedEditor from "@/components/tailwind/advanced-editor"
-import { normalizeEditorValue } from "@/lib/normalize-conten-block"
+import { Controller, useFieldArray, useForm } from "react-hook-form"
+import slugify from 'slugify'
+import { toast } from "sonner"
+import { z } from "zod"
 
 type CourseFormValues = z.infer<typeof courseFormSchema>
 
@@ -362,8 +362,8 @@ export default function CoursesPage() {
       header: "Изображение",
       cell: ({ row }) => (
         <Image
-          src={`${process.env.NEXT_PUBLIC_API_URL}/${row.original?.images[0]?.url}` || "/placeholder.svg"}
-          alt={`${process.env.NEXT_PUBLIC_API_URL}/${row.original.name}`}
+          src={`${env.NEXT_PUBLIC_API_URL}/${row.original?.images[0]?.url}` || "/placeholder.svg"}
+          alt={`${env.NEXT_PUBLIC_API_URL}/${row.original.name}`}
           width={100}
           height={100}
           style={{ height: 100, width: 100 }}
@@ -376,7 +376,7 @@ export default function CoursesPage() {
       header: "Название",
       cell: ({ row }) => <Link
         // @ts-ignore
-        href={`${process.env.NEXT_PUBLIC_API_URL}/${row.original.category?.url}/${row.original.url}`}
+        href={`${env.NEXT_PUBLIC_SITE_URL}/courses/${row.original.url}`}
         target="_blank"
         className="max-w-[200px] text-blue-500 truncate">
         {row.original.name}
@@ -668,7 +668,7 @@ export default function CoursesPage() {
                   />
                   {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                 </div>
-                
+
                 {/* Category */}
                 <div className="space-y-2">
                   <Label htmlFor="category">Категория</Label>
@@ -860,7 +860,7 @@ export default function CoursesPage() {
                     {watch("images")?.map((images, index) => (
                       <div key={images.url} className="relative h-32 w-32 rounded-md overflow-hidden border">
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/${images.url}`}
+                          src={`${env.NEXT_PUBLIC_API_URL}/${images.url}`}
                           alt={`Изображение ${index + 1}`}
                           fill
                           className="object-cover"
